@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find a Guide - OHA Travel</title>
+    <style>
+/* Dark Mode Variables */
+body.dark-mode {
+    --light: #020617; /* Deep midnight navy */
+    --dark: #f8fafc;
+    --glass: rgba(15, 23, 42, 0.7);
+    --card-bg: #1e293b;
+    --border: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .bg-visuals {
+    background: radial-gradient(circle at 50% 50%, #0f172a 0%, #020617 100%);
+}
+
+body.dark-mode .blob {
+    opacity: 0.2; /* Higher visibility in dark mode */
+    filter: blur(120px);
+}
+body.dark-mode .guide-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+body.dark-mode .blob-1 { background: #6366f1; } /* Change orange to Indigo-Violet */
+body.dark-mode .blob-2 { background: #d946ef; }
+
+/* Dark Mode Card Specifics */
+body.dark-mode .guide-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+}
+body.dark-mode .languages,
+body.dark-mode .back-home {
+    color: #94a3b8;
+}
+body.dark-mode .guide-info h3, 
+body.dark-mode .price,
+body.dark-mode h1,
+body.dark-mode p {
+    color: #ffffff;
+}
+body.dark-mode .filter-container {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid var(--border);
+}
+
+/* The Toggle Button Styling */
+.theme-toggle {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 3000;
+    box-shadow: 0 10px 20px rgba(255, 87, 34, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
+/* Adjust Blobs for Dark Mode */
+body.dark-mode .blob-1 { opacity: 0.15; filter: blur(120px); }
+body.dark-mode .blob-2 { opacity: 0.1; }
+
+       :root {
+    --primary: #ff5722;
+    --primary-gradient: linear-gradient(135deg, #ff5722 0%, #ff8a65 100%);
+    --dark: #0f172a;
+    --light: #f8fafc;
+    --accent: #10b981;
+    --gold: #f59e0b;
+    --glass: rgba(255, 255, 255, 0.8);
+}
+
+body { 
+    font-family: 'Inter', -apple-system, sans-serif; 
+    background-color: var(--light); 
+    background-image: radial-gradient(#e2e8f0 1px, transparent 1px);
+    background-size: 20px 20px;
+    margin: 0; padding: 20px; color: var(--dark); 
+    line-height: 1.6;
+        transition: background-color 0.5s ease, color 0.5s ease;
+    background-color: var(--light);
+}
+
+
+
+/* --- Dark Mode Component Overrides --- */
+
+body.dark-mode .filter-btn {
+    background: rgba(30, 41, 59, 0.4);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .filter-btn:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+/* Make the Active button glow */
+body.dark-mode .filter-btn.active {
+    background: var(--primary-gradient);
+    box-shadow: 0 0 20px rgba(255, 87, 34, 0.4);
+    color: white;
+}
+
+/* Guide Card Buttons */
+body.dark-mode .book-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .guide-card:hover .book-btn {
+    background: var(--primary-gradient);
+    border-color: transparent;
+    box-shadow: 0 5px 15px rgba(255, 87, 34, 0.3);
+}
+
+/* The Booking Drawer & Inputs */
+body.dark-mode .drawer-content, 
+body.dark-mode .modal-window,
+body.dark-mode .success-card {
+    background: #1e293b;
+    color: #fff;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .input-group input {
+    background: #0f172a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+body.dark-mode .pay-card {
+    background: #0f172a;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .pay-card:has(input:checked) {
+    background: rgba(255, 87, 34, 0.1);
+    border-color: var(--primary);
+}
+
+body.dark-mode hr {
+    opacity: 0.1;
+}
+
+/* Close Button fix */
+body.dark-mode .close-btn {
+    color: #94a3b8;
+}
+.book-btn, .filter-btn, .final-btn, .drawer-content {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* --- The Aesthetic Background Layer --- */
+.bg-visuals {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background: radial-gradient(circle at 50% 50%, #fff 0%, #f1f5f9 100%);
+    overflow: hidden;
+}
+
+.blob {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    background: var(--primary);
+    filter: blur(80px);
+    opacity: 0.07;
+    border-radius: 50%;
+    z-index: -1;
+    animation: move 20s infinite alternate;
+}
+
+.blob-1 { top: -100px; left: -100px; background: var(--primary); }
+.blob-2 { bottom: -100px; right: -100px; background: var(--accent); animation-delay: -5s; }
+.blob-3 { top: 40%; left: 60%; background: #3b82f6; animation-duration: 25s; }
+
+@keyframes move {
+    from { transform: translate(0, 0) scale(1); }
+    to { transform: translate(100px, 50px) scale(1.1); }
+}
+
+/* --- Premium Header --- */
+.header-area { 
+    text-align: center; 
+    margin-bottom: 60px; 
+    padding: 40px 0;
+}
+.header-area h1 { 
+    font-size: 2.5rem; 
+    font-weight: 800; 
+    letter-spacing: -1px; 
+    margin-bottom: 10px;
+}
+.back-home { 
+    text-decoration: none; 
+    color: #64748b; 
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+.back-home:hover { color: var(--primary); }
+
+/* --- Floating Navigation Filter --- */
+.filter-container { 
+    margin-bottom: 50px; 
+    text-align: center; 
+    position: sticky; 
+    top: 20px; 
+    z-index: 100;
+}
+.filter-btn { 
+    padding: 10px 22px; 
+    margin: 0 5px; 
+    cursor: pointer; 
+    border: 1px solid rgba(0,0,0,0.05); 
+    border-radius: 12px; 
+    background: var(--glass); 
+    backdrop-filter: blur(10px);
+    color: #64748b; 
+    font-weight: 600; 
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+}
+.filter-btn.active { 
+    background: var(--primary-gradient); 
+    color: white; 
+    border-color: transparent;
+    box-shadow: 0 10px 15px -3px rgba(255, 87, 34, 0.4);
+}
+.filter-btn:hover:not(.active) {
+    transform: translateY(-2px);
+    background: white;
+    color: var(--primary);
+}
+
+/* --- Modern Guide Cards --- */
+.guide-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+    gap: 30px; max-width: 1200px; margin: 0 auto;
+}
+
+.guide-card { 
+    background: white; 
+    border-radius: 24px; 
+    overflow: hidden; 
+    border: 1px solid rgba(0,0,0,0.03);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
+    transition: all 0.4s ease;
+    text-align: center; 
+    padding: 30px 20px; 
+    position: relative;
+}
+
+.guide-card:hover { 
+    transform: translateY(-12px); 
+    box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+}
+
+.guide-img { 
+    width: 120px; height: 120px; 
+    border-radius: 50%; 
+    padding: 5px;
+    background: var(--primary-gradient);
+    object-fit: cover; 
+    margin-bottom: 15px;
+}
+
+.rating { 
+    background: #fffbeb; 
+    color: var(--gold); 
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.8rem;
+}
+
+.specialty { 
+    color: var(--accent); 
+    font-weight: 700; 
+    text-transform: uppercase;
+    font-size: 0.7rem; 
+    letter-spacing: 1px;
+    margin-top: 15px;
+    display: block;
+}
+
+.price { 
+    font-size: 1.4rem; 
+    color: var(--dark); 
+    margin: 15px 0;
+}
+.price span { font-size: 0.9rem; color: #64748b; }
+
+.book-btn {
+    background: #f1f5f9; 
+    color: var(--dark); 
+    border: none; 
+    padding: 12px 25px;
+    border-radius: 14px;
+    width: 100%; 
+    cursor: pointer; 
+    font-weight: 700; 
+    transition: 0.3s;
+}
+.guide-card:hover .book-btn {
+    background: var(--dark);
+    color: white;
+}
+
+/* --- Premium Overlays --- */
+.modal-overlay, .success-overlay, .drawer-overlay {
+    display: none; 
+    position: fixed; 
+    inset: 0;
+    z-index: 2000;
+}
+
+.drawer-overlay.open { 
+    display: flex; 
+    background: rgba(15, 23, 42, 0.6); 
+    backdrop-filter: blur(8px);
+}
+
+.drawer-content { 
+    position: absolute; 
+    right: -100%; 
+    top: 0; height: 100%; width: 100%; 
+    max-width: 450px; 
+    background: white; 
+    padding: 40px; 
+    box-shadow: -10px 0 30px rgba(0,0,0,0.2);
+    transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.final-btn { 
+    background: var(--primary-gradient); 
+    box-shadow: 0 4px 14px rgba(255, 87, 34, 0.4);
+    border-radius: 12px;
+    /* other styles remain same */
+}
+
+       /* --- FIXED OVERLAYS SECTION --- */
+/* We remove .drawer-overlay from the shared 'display: none' list to handle it separately */
+.modal-overlay, .success-overlay {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(5px);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Fix: Drawer is 'none' by default so the blur doesn't show */
+.drawer-overlay { 
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0);
+    z-index: 2000;
+    transition: background 0.4s;
+}
+
+/* When the .open class is added via JS, we show the blur and the background */
+.drawer-overlay.open { 
+    display: flex; 
+    background: rgba(0,0,0,0.8); 
+    backdrop-filter: blur(5px); /* Only blurs when open */
+}
+
+.modal-window { background: white; padding: 30px; border-radius: 20px; max-width: 450px; width: 90%; position: relative; text-align: center; margin: auto; }
+
+.drawer-content { 
+    position: absolute; 
+    right: -100%; /* Hidden off-screen */
+    top: 0; 
+    height: 100%; 
+    width: 100%; 
+    max-width: 400px; 
+    background: white; 
+    padding: 40px 30px; 
+    overflow-y: auto; 
+    transition: 0.4s ease-in-out;
+    box-sizing: border-box;
+}
+
+.drawer-overlay.open .drawer-content { 
+    right: 0; /* Slides into view */
+}
+
+.success-card { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; margin: auto; }
+        
+        .modal-window { background: white; padding: 30px; border-radius: 20px; max-width: 450px; width: 90%; position: relative; text-align: center; margin: auto; }
+        
+        .drawer-content { 
+            position: absolute; right: -100%; top: 0; height: 100%; width: 100%; 
+            max-width: 400px; background: white; padding: 40px 30px; 
+            overflow-y: auto; transition: 0.4s ease-in-out;
+            box-sizing: border-box;
+        }
+        .drawer-overlay.open .drawer-content { right: 0; }
+        
+        .success-card { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; width: 90%; margin: auto; }
+        
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; border: none; background: none; cursor: pointer; }
+        .input-group { margin-bottom: 15px; text-align: left; display: flex; flex-direction: column; }
+        .input-group label { font-size: 0.8rem; font-weight: bold; margin-bottom: 5px; }
+        .input-group input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+
+        .payment-options { display: flex; gap: 10px; margin: 15px 0; }
+        .pay-card { 
+            flex: 1; border: 2px solid #eee; padding: 10px; border-radius: 10px; 
+            cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center;
+        }
+        .pay-card input { display: none; }
+        .pay-card:has(input:checked) { border-color: var(--primary); background: #fff4f1; }
+
+        .final-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="bg-visuals">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
+
+    <div class="header-area">
+        <a href="test.html" class="back-home">← Back to Homepage</a>
+        <h1>Meet Your Local Guides</h1>
+        <p>Book a local expert for a personalized journey.</p>
+    </div>
+
+    <div class="filter-container">
+        <button class="filter-btn active" onclick="filterGuides('all', event)">All Cities</button>
+        <button class="filter-btn" onclick="filterGuides('paris', event)">Paris</button>
+        <button class="filter-btn" onclick="filterGuides('marrakesh', event)">Marrakesh</button>
+        <button class="filter-btn" onclick="filterGuides('dubai', event)">Dubai</button>
+        <button class="filter-btn" onclick="filterGuides('tokyo', event)">Tokyo</button>
+    </div>
+
+    <div class="guide-grid">
+        <div class="guide-card" data-city="paris">
+            <img src="https://i.pravatar.cc/150?u=amelie" class="guide-img" alt="Amélie">
+            <div class="guide-info">
+                <h3>Jean Laurent</h3>
+                <div class="rating">★★★★★ (128)</div>
+                <span class="specialty">Art & Louvre Specialist</span>
+                <p class="languages">🇫🇷 FR, 🇬🇧 EN</p>
+                <p class="price">45€ / Hr</p>
+            </div>
+            <button class="book-btn" onclick="openGuideModal('Amélie Laurent', '45€', 'https://i.pravatar.cc/150?u=amelie', '5/5')">View Profile</button>
+        </div>
+
+        <div class="guide-card" data-city="marrakesh">
+            <img src="https://i.pravatar.cc/150?u=yassine" class="guide-img" alt="Yassine">
+            <div class="guide-info">
+                <h3>Yassmine Bennani</h3>
+                <div class="rating">★★★★★ (210)</div>
+                <span class="specialty">Secret Medina Foodie</span>
+                <p class="languages">🇲🇦 AR, 🇫🇷 FR, 🇬🇧 EN</p>
+                <p class="price">30€ / Hr</p>
+            </div>
+            <button class="book-btn" onclick="openGuideModal('Yassine Bennani', '30€', 'https://i.pravatar.cc/150?u=yassine', '5/5')">View Profile</button>
+        </div>
+
+        <div class="guide-card" data-city="dubai">
+            <img src="https://i.pravatar.cc/150?u=omar" class="guide-img" alt="Omar">
+            <div class="guide-info">
+                <h3>Omar Al-Sayed</h3>
+                <div class="rating">★★★★☆ (85)</div>
+                <span class="specialty">Luxury & Skyscrapers</span>
+                <p class="languages">🇬🇧 EN, 🇦🇪 AR</p>
+                <p class="price">60€ / Hr</p>
+            </div>
+            <button class="book-btn" onclick="openGuideModal('Omar Al-Sayed', '60€', 'https://i.pravatar.cc/150?u=omar', '4.5/5')">View Profile</button>
+        </div>
+
+        <div class="guide-card" data-city="tokyo">
+            <img src="https://i.pravatar.cc/150?u=hana" class="guide-img" alt="Hana">
+            <div class="guide-info">
+                <h3>Riyuu Tanaka</h3>
+                <div class="rating">★★★★★ (156)</div>
+                <span class="specialty">Anime & Tech Culture</span>
+                <p class="languages">🇯🇵 JP, 🇬🇧 EN</p>
+                <p class="price">40€ / Hr</p>
+            </div>
+            <button class="book-btn" onclick="openGuideModal('Hana Tanaka', '40€', 'https://i.pravatar.cc/150?u=hana', '5/5')">View Profile</button>
+        </div>
+    </div>
+
+    <div id="guide-modal" class="modal-overlay">
+        <div class="modal-window">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <img id="m-img" src="" style="width:100px; height:100px; border-radius:50%; margin-bottom:15px;" alt="Guide">
+            <h2 id="m-title">Name</h2>
+            <div id="m-stars" class="rating"></div>
+            <p><strong>Top Rated Local Guide</strong></p>
+            <p>Get a personalized itinerary and discover hidden gems only locals know about.</p>
+            <hr>
+            <p>Hourly Rate: <span id="m-price" class="price"></span></p>
+            <button class="final-btn" onclick="openDrawer()">Check Availability</button>
+        </div>
+    </div>
+
+    <div id="guide-drawer" class="drawer-overlay">
+        <div class="drawer-content">
+            <button class="close-btn" onclick="closeDrawer()">&times;</button>
+            <h2>Book Your Session</h2>
+            <form onsubmit="handleFinal(event)">
+                <div class="input-group"><label>Select Date</label><input type="date" required></div>
+                <div class="input-group"><label>Duration (Hours)</label><input type="number" min="1" max="10" value="3" required></div>
+                
+                <label style="font-size: 0.8rem; font-weight: bold;">Payment Method</label>
+                <div class="payment-options">
+                    <label class="pay-card">
+                        <input type="radio" name="p" onclick="toggleCard(true)" required>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" height="20" alt="Visa">
+                    </label>
+                    <label class="pay-card">
+                        <input type="radio" name="p" onclick="toggleCard(true)">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" height="20" alt="Mastercard">
+                    </label>
+                </div>
+
+                <div id="card-fields" style="display:none; background:#f9f9f9; padding:15px; border-radius:10px; margin-bottom:15px;">
+                    <input type="text" placeholder="Card Number" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" placeholder="MM/YY" style="width:50%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                        <input type="text" placeholder="CVV" style="width:50%; padding:10px; border:1px solid #ddd; border-radius:5px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <button type="submit" id="s-btn" class="final-btn">Confirm Reservation</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="success-o" class="success-overlay">
+        <div class="success-card">
+            <div style="font-size:60px;">🌟</div>
+            <h2>Meeting Scheduled!</h2>
+            <p>Your guide will email you to coordinate the meeting point.</p>
+            <button class="final-btn" onclick="location.reload()">Great!</button>
+        </div>
+    </div>
+
+    <button class="theme-toggle" onclick="toggleTheme()" id="theme-btn">
+    🌙
+</button>
+
+    <script>
+        function filterGuides(city, event) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.guide-card').forEach(c => {
+                c.style.display = (city === 'all' || c.dataset.city === city) ? 'block' : 'none';
+            });
+        }
+
+        function openGuideModal(n, p, i, s) {
+            document.getElementById('m-title').innerText = n;
+            document.getElementById('m-price').innerText = p;
+            document.getElementById('m-img').src = i;
+            document.getElementById('m-stars').innerText = "Rating: " + s;
+            document.getElementById('guide-modal').style.display = 'flex';
+        }
+
+        function closeModal() { 
+            document.getElementById('guide-modal').style.display = 'none'; 
+        }
+
+       function openDrawer() {
+    closeModal();
+    const drawer = document.getElementById('guide-drawer');
+    drawer.style.display = 'flex'; // Turn it on
+    setTimeout(() => {
+        drawer.classList.add('open'); // Then slide it in
+    }, 10);
+}
+
+function closeDrawer() {
+    const drawer = document.getElementById('guide-drawer');
+    drawer.classList.remove('open');
+    setTimeout(() => {
+        drawer.style.display = 'none'; // Turn it off after animation
+    }, 400);
+}
+
+        function toggleCard(s) { 
+            document.getElementById('card-fields').style.display = s ? 'block' : 'none'; 
+        }
+
+        function handleFinal(e) {
+            e.preventDefault();
+            const b = document.getElementById('s-btn');
+            b.innerText = "Processing..."; 
+            b.disabled = true;
+            
+            setTimeout(() => { 
+                closeDrawer(); 
+                document.getElementById('success-o').style.display = 'flex'; 
+            }, 2000);
+        }
+
+        // Fade in cards one by one when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    const cards = document.querySelectorAll('.guide-card');
+    cards.forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease';
+        
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, 100 * index);
+    });
+});
+
+function toggleTheme() {
+    const body = document.body;
+    const btn = document.getElementById('theme-btn');
+    
+    body.classList.toggle('dark-mode');
+    
+    if (body.classList.contains('dark-mode')) {
+        btn.innerText = '☀️';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        btn.innerText = '🌙';
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Check for saved theme on page load
+window.onload = () => {
+    if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        document.getElementById('theme-btn').innerText = '☀️';
+    }
+};
+    </script>
+</body>
+</html>

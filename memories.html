@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Travel Memories</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  background: #fdf6ec;
+  color: #3b2f2f;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ===== FLOATING EMOJIS ===== */
+.emoji {
+  position: absolute;
+  font-size: 2rem;
+  opacity: 0.15;
+  pointer-events: none;
+  animation: float 15s linear infinite;
+}
+
+@keyframes float {
+  0% { transform: translateY(100vh) rotate(0deg); }
+  100% { transform: translateY(-20vh) rotate(360deg); }
+}
+
+/* ===== HEADER ===== */
+.memories-header {
+  text-align: center;
+  padding: 80px 20px 40px;
+}
+
+.memories-header h1 {
+  font-size: 3.2rem;
+  margin-bottom: 10px;
+}
+
+.memories-header p {
+  font-size: 1.1rem;
+  opacity: 0.85;
+}
+
+/* ===== SCRAPBOOK GRID ===== */
+.scrapbook {
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px 20px 80px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== MEMORY CARD ===== */
+.memory {
+  background: #fff;
+  padding: 16px 16px 22px;
+  border-radius: 16px;
+  box-shadow: 0 14px 35px rgba(0,0,0,0.12);
+  transform: rotate(-1.5deg);
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.memory:nth-child(even) {
+  transform: rotate(1.5deg);
+}
+
+.memory:hover {
+  transform: rotate(0deg) scale(1.03);
+}
+
+/* tape effect */
+.memory::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 30%;
+  width: 70px;
+  height: 20px;
+  background: rgba(245,193,108,0.7);
+  transform: rotate(-3deg);
+  border-radius: 6px;
+}
+
+/* memory image */
+.memory img.memory-photo {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+/* user info */
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.user-info img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #f5c16c;
+}
+
+.memory h3 {
+  margin: 12px 0 6px;
+  font-size: 1.2rem;
+}
+
+.memory span {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.memory p {
+  font-size: 0.95rem;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- ===== FLOATING EMOJIS ===== -->
+<span class="emoji" style="left:5%; animation-duration:18s;" title="Love ❤️">❤️</span>
+<span class="emoji" style="left:20%; animation-duration:22s;" title="Travel ✈️">✈️</span>
+<span class="emoji" style="left:35%; animation-duration:20s;" title="Palm Tree 🌴">🌴</span>
+<span class="emoji" style="left:50%; animation-duration:25s;" title="Love ❤️">❤️</span>
+<span class="emoji" style="left:65%; animation-duration:18s;" title="Travel ✈️">✈️</span>
+<span class="emoji" style="left:80%; animation-duration:20s;" title="Palm Tree 🌴">🌴</span>
+<span class="emoji" style="left:90%; animation-duration:22s;" title="Love ❤️">❤️</span>
+
+<span class="emoji" style="left:27%; animation-duration:18s;" title="Love ❤️">❤️</span>
+<span class="emoji" style="left:84%; animation-duration:22s;" title="Travel ✈️">✈️</span>
+<span class="emoji" style="left:79%; animation-duration:20s;" title="Palm Tree 🌴">🌴</span>
+<span class="emoji" style="left:12%; animation-duration:25s;" title="Love ❤️">❤️</span>
+<span class="emoji" style="left:84%; animation-duration:18s;" title="Travel ✈️">✈️</span>
+<span class="emoji" style="left:46%; animation-duration:20s;" title="Palm Tree 🌴">🌴</span>
+<span class="emoji" style="left:87%; animation-duration:22s;" title="Love ❤️">❤️</span>
+
+<header class="memories-header">
+  <h1>Our Travel Memories ✨</h1>
+  <p>Moments captured, stories lived, memories forever.</p>
+</header>
+
+<section class="scrapbook">
+
+  <div class="memory">
+    <img class="memory-photo" src="Paris.jpg" alt="Paris">
+    <h3>Paris</h3>
+    <div class="user-info">
+      <img src="sara.jpg" alt="Sara">
+      <span>Sara — July 2024</span>
+    </div>
+    <p>Late walks, city lights and unforgettable moments.</p>
+  </div>
+
+  <div class="memory">
+    <img class="memory-photo" src="Marakech.jpg" alt="Marrakech">
+    <h3>Marrakech</h3>
+    <div class="user-info">
+      <img src="youssef.jpg" alt="Youssef">
+      <span>Youssef — Spring 2024</span>
+    </div>
+    <p>Colors, warmth, traditions and soulful nights.</p>
+  </div>
+
+  <div class="memory">
+    <img class="memory-photo" src="Bali.jpg" alt="Bali">
+    <h3>Bali</h3>
+    <div class="user-info">
+      <img src="lina.jpg" alt="Lina">
+      <span>Lina — Summer 2023</span>
+    </div>
+    <p>Peace, ocean breeze and slow mornings.</p>
+  </div>
+
+  <div class="memory">
+    <img class="memory-photo" src="DUBAI.jpg" alt="Dubai">
+    <h3>Dubai</h3>
+    <div class="user-info">
+      <img src="adam.jpg" alt="Adam">
+      <span>Adam — Winter 2024</span>
+    </div>
+    <p>Luxury, desert sunsets and vibrant nights.</p>
+  </div>
+
+
+  <div class="memory">
+    <img class="memory-photo" src="Santorini-CreditiStock_Maglara.jpg" alt="Santorini">
+    <h3>Santorini</h3>
+    <div class="user-info">
+      <img src="noah.jpg" alt="Noah">
+      <span>Noah — Summer 2024</span>
+    </div>
+    <p>White walls, blue skies and calm sunsets.</p>
+  </div>
+
+</section>
+
+</body>
+</html>

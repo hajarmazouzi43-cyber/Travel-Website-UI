@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Our Travel Memories</title>
+<style>
+:root {
+  --bg-color: #fdf6e3;
+  --road-color: #073b4c;
+  --accent-red: #ef476f;
+  --accent-blue: #118ab2;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-color);
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* BACKGROUND */
+#city-bg {
+  position: fixed;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transition: opacity 1.5s ease;
+  opacity: 0;
+  z-index: -1;
+}
+.bg-overlay { position: absolute; inset:0; background: rgba(253,246,227,0.35); }
+
+/* VIEWPORT */
+.viewport { width: 100vw; height: 500px; position: relative; overflow: hidden; }
+
+/* CAR */
+.car {
+  position: absolute;
+  bottom: 105px; left:50%;
+  transform: translateX(-50%);
+  width:95px; height:32px;
+  background: var(--accent-red);
+  border-radius:12px 18px 5px 5px;
+  z-index:1000;
+  animation: bounce 0.3s infinite alternate;
+}
+.car::after {
+  content:"";
+  position:absolute; top:-18px; left:15px;
+  width:45px; height:20px;
+  background: var(--accent-red);
+  border-radius:12px 18px 0 0;
+}
+.wheel { position:absolute; bottom:-8px; width:20px; height:20px; background:var(--road-color); border-radius:50%; border:3px solid #fff;}
+.wheel.left { left:10px; } .wheel.right { right:10px; }
+@keyframes bounce { from{transform:translateX(-50%) translateY(0);} to{transform:translateX(-50%) translateY(-2px);} }
+
+/* TIMELINE */
+.timeline { position:absolute; bottom:0; width:5000px; height:300px; transition: transform 2.8s cubic-bezier(0.45,0,0.55,1);}
+.road { position:absolute; bottom:80px; width:100%; height:45px; background:var(--road-color);}
+.road::after { content:""; position:absolute; top:50%; width:100%; border-top:4px dashed rgba(255,255,255,0.3); }
+
+/* DESTINATIONS */
+.destination { position:absolute; bottom:20px; transform:translateX(-50%); text-align:center;}
+.destination span { background:white; padding:12px 30px; border-radius:35px; font-weight:800; color:var(--road-color); box-shadow:0 10px 20px rgba(0,0,0,0.1); }
+
+/* CITY BUBBLE */
+#city-bubble {
+  position:absolute; bottom:160px; left:50%;
+  transform: translateX(-50%) scale(0);
+  width:260px; background:white; padding:18px; border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.15);
+  z-index:2000; text-align:center; transition:0.5s;
+}
+.city-images { display:flex; gap:6px; margin-top:10px; }
+.city-images img { width:100%; max-height:90px; border-radius:10px; object-fit:cover; }
+
+/* FINAL MESSAGE */
+#final-message {
+  position: fixed; bottom:-200px; left:50%;
+  transform: translateX(-50%);
+  background:white; padding:20px 30px; border-radius:20px;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+  font-weight:600; text-align:center;
+  transition: bottom 0.8s ease-out;
+  z-index:3000;
+}
+#final-message a {
+  display:inline-block; margin-top:12px; padding:10px 18px;
+  background:var(--accent-blue); color:white; text-decoration:none; border-radius:12px;
+}
+</style>
+</head>
+<body>
+
+<div id="city-bg"><div class="bg-overlay"></div></div>
+<div class="viewport">
+
+  <div id="city-bubble"></div>
+  <div id="final-message">
+    Ready to make more memories with us? ✨<br>
+    <a href="test.html" target="_blank">Let's Go 🌍</a>
+  </div>
+
+  <div class="car"><div class="wheel left"></div><div class="wheel right"></div></div>
+  <div class="plane" id="plane"><div class="plane-body"></div></div>
+
+  <div class="scene">
+    <div class="timeline" id="timeline">
+      <div class="road"></div>
+
+      <div class="destination" style="left:800px" data-bg="https://images.unsplash.com/photo-1502602898657-3e91760cbb34" data-text="We walked under the Eiffel Tower, drank coffee, and got lost on purpose 💕" data-images="https://images.unsplash.com/photo-1508057198894-247b23fe5ade"><span>🇫🇷 Paris · 2023</span></div>
+
+      <div class="destination" style="left:2200px" data-bg="344316.jpg" data-text="Souks, sunsets, and mint tea every evening 🌿" data-images="https://images.unsplash.com/photo-1548013146-72479768bada"><span>🇲🇦 Marrakech · 2024</span></div>
+
+      <div class="destination" style="left:3600px" data-bg="https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e" data-text="Neon nights, ramen breaks, and quiet temples 🌸" data-images="https://images.unsplash.com/photo-1503899036084-c55cdd92da26"><span>🇯🇵 Tokyo · 2025</span></div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const timeline = document.getElementById("timeline");
+const plane = document.getElementById("plane");
+const cityBg = document.getElementById("city-bg");
+const bubble = document.getElementById("city-bubble");
+const finalMessage = document.getElementById("final-message");
+const destinations = document.querySelectorAll(".destination");
+
+let index = 0;
+
+function showBubble(dest) {
+  bubble.innerHTML = `<strong>${dest.dataset.text}</strong>`;
+  if(dest.dataset.images) bubble.innerHTML += `<div class="city-images"><img src="${dest.dataset.images}"></div>`;
+  bubble.style.transform = "translateX(-50%) scale(1)";
+}
+
+function hideBubble() { bubble.style.transform = "translateX(-50%) scale(0)"; }
+
+function moveTimeline(i) {
+  hideBubble();
+  cityBg.style.opacity = "0";
+  const destX = destinations[i].offsetLeft;
+  timeline.style.transform = `translateX(-${destX - window.innerWidth/2}px)`;
+
+  setTimeout(()=>{
+    cityBg.style.backgroundImage = `url('${destinations[i].dataset.bg}')`;
+    cityBg.style.opacity = "1";
+    showBubble(destinations[i]);
+
+    // FINAL MESSAGE FOR LAST DESTINATION
+    if(i === destinations.length -1){
+      setTimeout(()=>{
+        hideBubble();
+        setTimeout(()=>{
+          finalMessage.style.bottom = "150px"; // slide up
+        },700);
+      },3500);
+    }
+  },1500);
+}
+
+function flyPlane(callback){
+  plane.style.display="block";
+  let x=-150;
+  const fly=setInterval(()=>{
+    x+=12;
+    plane.style.left = x + "px";
+    if(x>window.innerWidth+200){ clearInterval(fly); plane.style.display="none"; callback(); }
+  },16);
+}
+
+function next(){
+  if(index >= destinations.length) return;
+  moveTimeline(index);
+  if(index === destinations.length-1) return; // stop after last
+  setTimeout(()=>{
+    const nextDest = destinations[index+1];
+    if(destinations[index].dataset.country !== nextDest.dataset.country){
+      flyPlane(()=>{ index++; next(); });
+    }else{ index++; next(); }
+  },6500);
+}
+
+window.onload = next;
+</script>
+
+</body>
+</html>

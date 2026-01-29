@@ -1,0 +1,4334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Header voyage</title>
+
+  <style>
+    /* ===== RESET ===== */
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #ffffff;
+      color: #111;
+    }
+
+    /* ===== BLUR ===== */
+    body.blur header,
+    body.blur main { filter: blur(6px); }
+
+    :root{
+      --blue:#1b94ea;
+      --blue2:#82b0ef;
+      --danger:#e63946;
+      --ok:#0b6b55;
+      --text:#111;
+    }
+
+    /* ===== HEADER ===== */
+    .hero {
+      position: relative;
+      height: 540px;
+      background-image: url("voyage.jpg");
+      background-size: cover;
+      background-position: center;
+      overflow: hidden;
+    }
+
+    .main_nav{
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      gap: 26px;
+      z-index: 3;
+      flex-wrap: wrap;
+    }
+
+    .main_nav a {
+      position: relative;
+      color: #0072c4;
+      text-decoration: none;
+      font-weight: 800;
+      padding-bottom: 4px;
+      cursor: pointer;
+      transition: color 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .main_nav a::after{
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 2px;
+      background-color: #ffffff;
+      transition: width 0.3s ease;
+    }
+    .main_nav a:hover::after{ width: 100%; }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      color: #ffffff;
+      padding-top: 25vh;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .hero-content h1 {
+      font-size: clamp(2.2rem, 6vw, 5rem);
+      margin: 0 0 0.5rem;
+      color: #138de4;
+    }
+
+    .hero-content p {
+      font-size: 1.2rem;
+      margin: 0 0 1rem;
+      font-weight: 700;
+    }
+
+    .hero-tear {
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 200px;
+      line-height: 0;
+    }
+    .hero-tear svg { display: block; width: 100%; height: 100%; }
+
+    /* ===== SEARCH ===== */
+    .search-wrapper {
+      margin: 20px auto 0;
+      position: relative;
+      width: min(500px, 85%);
+      padding: 2px;
+    }
+
+    #search-input {
+      width: 100%;
+      height: 50px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      color: #111;
+    }
+
+    #suggestions {
+      position: absolute;
+      top: 110%;
+      left: 0;
+      width: 100%;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+      z-index: 5;
+    }
+
+    .suggestion-item {
+      padding: 8px 12px;
+      font-size: 0.95rem;
+      color: #333;
+      cursor: pointer;
+    }
+    .suggestion-item:hover { background: #f2f2f2; }
+
+    /* ===== CONTACT MODAL ===== */
+    .contact-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s ease;
+      z-index: 999;
+    }
+    .contact-overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .contact-modal {
+      width: 360px;
+      max-width: 90%;
+      background: linear-gradient(135deg, #82b0ef, #1b94ea);
+      border-radius: 20px;
+      color: #ffffff;
+      padding: 22px 22px 18px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      position: relative;
+      transform: translateY(-15px) scale(0.9);
+      opacity: 0;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+    .contact-overlay.show .contact-modal {
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+    .contact-close {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      font-size: 22px;
+      border: none;
+      background: none;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(255,255,255,0.2);
+      padding: 2px 8px;
+      border-radius: 999px;
+      margin-bottom: 8px;
+    }
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 6px 0;
+    }
+    .contact-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .contact-modal textarea {
+      width: 100%;
+      border: none;
+      border-radius: 12px;
+      padding: 8px 10px;
+      margin-top: 6px;
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      resize: vertical;
+      min-height: 60px;
+    }
+    .contact-modal button.send-btn {
+      margin-top: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 999px;
+      padding: 9px 0;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #070003;
+      background: #ffffff;
+      cursor: pointer;
+    }
+
+    /* ===== POLAROID SECTION ===== */
+    .polaroid-section{ padding:70px 20px; }
+    .section-title{
+      text-align:center;
+      font-size:2.6rem;
+      font-weight:900;
+      margin:0 0 45px;
+      letter-spacing:-0.02em;
+    }
+    .section-title span{ color:var(--blue); position:relative; }
+    .section-title span::after{
+      content:"";
+      position:absolute; left:0; bottom:-8px;
+      width:100%; height:4px;
+      background:linear-gradient(90deg,var(--blue),var(--blue2));
+      border-radius:6px;
+    }
+
+    .marquee{ overflow:hidden; width:100%; padding:10px 0 20px; }
+    .track{
+      display:flex; gap:26px; width:max-content;
+      animation: scroll-left 35s linear infinite;
+    }
+    @keyframes scroll-left{
+      0%{ transform:translateX(0); }
+      100%{ transform:translateX(-50%); }
+    }
+    .marquee:hover .track{ animation-play-state:paused; }
+
+    .polaroid{
+      position:relative;
+      width:310px;
+      background:#fff;
+      border-radius:18px;
+      padding:16px;
+      box-shadow:0 18px 40px rgba(0,0,0,0.22);
+      transform:rotate(-2deg);
+      transition: transform 0.18s ease;
+      overflow:hidden;
+      cursor:pointer;
+    }
+    .polaroid:nth-child(2n){ transform:rotate(2deg); }
+    .polaroid:hover{ transform:rotate(0deg) translateY(-8px); }
+
+    .polaroid::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:18px;
+      background:linear-gradient(120deg,rgba(255,255,255,0.18),transparent 60%);
+      pointer-events:none;
+    }
+    .polaroid img{
+      width:100%;
+      height:200px;
+      object-fit:cover;
+      border-radius:14px;
+     
+    }
+    
+   .tag{
+  position:absolute;
+  top:14px;
+  right:14px;
+
+  display:inline-flex;        /* IMPORTANT: pas block */
+  align-items:center;
+  justify-content:center;
+
+  padding:8px 14px;
+  border-radius:999px;
+
+  width:auto;                 /* IMPORTANT */
+  max-width:70%;
+  white-space:nowrap;         /* pas de retour à la ligne */
+
+  font-size:0.85rem;
+  font-weight:900;
+  color:#fff;
+  box-shadow:0 8px 18px rgba(0,0,0,0.35);
+  z-index:2;
+}
+
+.tag.discount{ background:linear-gradient(135deg,#ff4757,#ff6b81); }
+
+.tag.visited{
+  top:54px;
+  background:linear-gradient(135deg,#00b894,#96e6cf);
+}
+
+.tag.ticket{
+  top:54px;
+ 
+  left:auto;
+  width:100px;                 /* IMPORTANT */
+  background:linear-gradient(135deg,#6c5ce7,#a29bfe);
+}
+
+
+    .card-body{ padding-top:12px; }
+    .caption{ margin:0; text-align:center; font-weight:950; font-size:1.1rem; }
+    .mini-infos{
+      display:flex; gap:8px; justify-content:center; flex-wrap:wrap;
+      margin:10px 0;
+    }
+    .chip{
+      background:#eef6ff;
+      border:1px solid rgba(27,148,234,0.18);
+      padding:6px 10px;
+      border-radius:999px;
+      font-weight:800;
+      font-size:0.86rem;
+    }
+    .price-mini{ display:flex; justify-content:center; gap:10px; align-items:baseline; }
+    .price-mini .old{ color:#9aa0a6; text-decoration:line-through; font-weight:900; }
+    .price-mini .new{ color:var(--danger); font-size:1.1rem; font-weight:950; }
+    .stockline{
+      display:flex; justify-content:space-between; gap:10px;
+      margin-top:10px;
+      font-size:0.85rem; font-weight:800; color:#334;
+    }
+    .stockline .inc{ color:var(--ok); }
+
+    /* ===== WIZARD (CSS manquant) ===== */
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,0.60);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:5000;
+    }
+    .modal{
+      width:560px; max-width:92vw; max-height:88vh;
+      display:flex; flex-direction:column;
+      background:#fff;
+      border-radius:22px;
+      overflow:hidden;
+      box-shadow:0 26px 70px rgba(0,0,0,0.45);
+      position:relative;
+    }
+    .modal-close{
+      position:absolute;
+      top:10px; right:12px;
+      border:none;
+      background:rgba(0,0,0,0.35);
+      color:#fff;
+      width:34px; height:34px;
+      border-radius:999px;
+      font-size:20px;
+      cursor:pointer;
+      z-index:10;
+    }
+
+    .stepper{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 16px;
+      border-bottom:1px solid #eef1f4;
+      background:#fff;
+    }
+    .step{ display:flex; align-items:center; gap:8px; font-weight:900; color:#667; }
+    .step .dot{
+      width:26px; height:26px;
+      border-radius:999px;
+      display:grid; place-items:center;
+      border:2px solid #cfd6dd;
+      color:#667;
+      font-size:0.9rem;
+    }
+    .step.active{ color:var(--blue); }
+    .step.active .dot{ border-color:var(--blue); background:#eef6ff; color:var(--blue); }
+    .step.done .dot{ border-color:var(--ok); background:rgba(11,107,85,0.08); color:var(--ok); }
+    .line{ flex:1; height:2px; background:#e7ecf1; border-radius:99px; }
+
+    .banner{
+      padding:14px 18px 10px;
+      background:linear-gradient(135deg,var(--blue2),var(--blue));
+      color:#fff;
+    }
+    .banner h2{ margin:0 0 4px; font-size:1.35rem; }
+    .banner p{ margin:0; font-weight:650; opacity:0.95; }
+
+    .pane{ overflow:auto; }
+    .pane .hero{ width:100%; height:190px; object-fit:cover; display:block; }
+    .pad{ padding:16px 18px 18px; }
+
+    .dest-title{ margin:0 0 6px; font-size:1.5rem; font-weight:950; color:#138de4; }
+    .dest-meta{ display:flex; gap:12px; flex-wrap:wrap; font-size:0.95rem; font-weight:750; color:#334; }
+
+    .price-row{ display:flex; gap:12px; align-items:baseline; margin:10px 0; }
+    .price-old{ text-decoration:line-through; color:#9aa0a6; font-weight:900; }
+    .price-new{ color:var(--danger); font-size:1.6rem; font-weight:950; }
+    .desc{ margin:10px 0 14px; color:#444; line-height:1.45; }
+
+    .two-badges{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+    .pill{
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:900;
+      background:#f1f8fe;
+      border:1px solid rgba(27,148,234,0.25);
+    }
+    .pill.warn{ background:#fff3f3; border-color:rgba(230,57,70,0.18); }
+
+    .btn-row{ display:grid; gap:10px; }
+    .btn-row.sticky{
+      position:sticky;
+      bottom:0;
+      background:#fff;
+      padding-top:12px;
+    }
+
+    .primary-btn{
+      width:100%;
+      border:none;
+      padding:12px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      color:#fff;
+      font-weight:950;
+      font-size:1.02rem;
+      background:linear-gradient(135deg,var(--blue),var(--blue2));
+    }
+    .secondary-btn{
+      width:100%;
+      border:1px solid #d7dbe0;
+      padding:11px 14px;
+      border-radius:999px;
+      cursor:pointer;
+      color:#111;
+      font-weight:900;
+      background:#fff;
+    }
+
+    .form{ padding:16px 18px 18px; display:grid; gap:12px; }
+    .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .form label{ font-size:0.9rem; font-weight:900; color:#333; display:grid; gap:6px; }
+    .form input, .form select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid #d7dbe0;
+      outline:none;
+      font-size:0.95rem;
+    }
+
+    .hint{ color:#667; font-weight:700; }
+    .err{ color:var(--danger); font-weight:900; min-height:14px; }
+
+    .checkline{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      font-weight:850;
+      color:#334;
+    }
+
+    .summary{
+      background:#f1f8fe;
+      border:1px solid rgba(27,148,234,0.25);
+      padding:12px;
+      border-radius:14px;
+      color:#1b2b3a;
+      font-weight:800;
+      display:grid;
+      gap:6px;
+    }
+    .summary .row{ display:flex; justify-content:space-between; gap:12px; }
+    .summary .total{
+      margin-top:6px;
+      padding-top:8px;
+      border-top:1px solid rgba(0,0,0,0.08);
+      font-size:1.05rem;
+    }
+
+    .pay-methods{
+      border:1px solid #eef1f4;
+      border-radius:14px;
+      padding:12px;
+    }
+    .pay-title{ margin:0 0 10px; font-weight:950; }
+    .methods{ display:flex; gap:10px; flex-wrap:wrap; }
+    .method{
+      border:1px solid #d7dbe0;
+      background:#fff;
+      padding:10px 12px;
+      border-radius:12px;
+      font-weight:900;
+      cursor:pointer;
+    }
+    .method.active{
+      border-color:rgba(27,148,234,0.7);
+      box-shadow:0 0 0 4px rgba(27,148,234,0.12);
+    }
+
+    .success-title{ margin:0 0 8px; font-size:1.45rem; font-weight:950; color:var(--ok); }
+    .oktext{ margin:0; color:#444; font-weight:750; line-height:1.4; }
+    .subttl{ margin-top:14px; font-weight:950; color:#334; }
+
+    .ticketbox{
+      margin-top:12px;
+      border:1px dashed rgba(27,148,234,0.45);
+      border-radius:14px;
+      padding:12px;
+      font-weight:850;
+      color:#1b2b3a;
+      background:#fbfdff;
+    }
+
+    .suggest-grid{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns:repeat(2,minmax(0,1fr));
+      gap:10px;
+    }
+    .suggest-card{
+      border:1px solid #e8edf2;
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+      cursor:pointer;
+    }
+    .suggest-card img{ width:100%; height:110px; object-fit:cover; display:block; }
+    .suggest-card p{ margin:0; padding:10px; font-weight:950; color:#138de4; font-size:0.95rem; }
+
+    @media (max-width:700px){
+      .section-title{ font-size:2rem; }
+      .polaroid{ width:270px; }
+      .grid2{ grid-template-columns:1fr; }
+    }
+
+
+
+
+    /* ===== Pretty Ticket ===== */
+  .bp{
+  display:grid;
+  grid-template-columns: 1fr 260px;
+  gap:0;
+  border-radius:24px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow:0 18px 50px rgba(0,0,0,0.18);
+  border:1px solid rgba(0,0,0,0.06);
+}
+
+/* gauche */
+.bp-left{
+  padding:18px 18px 16px;
+  position:relative;
+}
+
+.bp-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:12px;
+}
+.bp-brand{ display:flex; align-items:center; gap:10px; }
+.bp-logo{
+  width:44px; height:44px;
+  border-radius:14px;
+  display:grid; place-items:center;
+  background:linear-gradient(135deg,#1b94ea,#82b0ef);
+  color:#fff;
+  box-shadow:0 10px 22px rgba(0,0,0,0.18);
+  font-size:18px;
+}
+.bp-title{ font-weight:950; letter-spacing:0.12em; font-size:0.95rem; }
+.bp-sub{ color:#64748b; font-weight:800; font-size:0.85rem; }
+
+.bp-status{
+  font-weight:950;
+  font-size:0.78rem;
+  padding:8px 12px;
+  border-radius:999px;
+  color:#065f46;
+  background:rgba(16,185,129,0.14);
+  border:1px solid rgba(16,185,129,0.22);
+  letter-spacing:0.08em;
+}
+
+/* route */
+.bp-route{
+  display:grid;
+  grid-template-columns: 1fr 120px 1fr;
+  align-items:center;
+  margin:10px 0 14px;
+}
+.bp-code{
+  font-weight:1000;
+  font-size:1.7rem;
+  letter-spacing:0.10em;
+}
+.bp-city{ color:#64748b; font-weight:850; margin-top:2px; }
+.bp-mid{ display:flex; align-items:center; justify-content:center; gap:10px; }
+.bp-line{
+  width:38px; height:2px;
+  background:rgba(0,0,0,0.12);
+  border-radius:999px;
+}
+.bp-plane{ font-size:18px; opacity:0.9; }
+
+/* message */
+.bp-message{
+  border-radius:16px;
+  padding:12px;
+  background:linear-gradient(135deg, rgba(27,148,234,0.10), rgba(130,176,239,0.22));
+  border:1px solid rgba(27,148,234,0.12);
+  margin-bottom:12px;
+}
+.bp-msg-title{ font-weight:950; color:#0b4d78; margin-bottom:4px; }
+.bp-msg-text{ font-weight:750; color:#334155; font-size:0.92rem; line-height:1.35; }
+
+.bp-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:10px;
+}
+.bp-item{
+  background:#fafafa;
+  border:1px solid rgba(0,0,0,0.08);
+  border-radius:14px;
+  padding:10px;
+}
+.k{ color:#64748b; font-weight:900; font-size:0.8rem; }
+.v{ color:#111; font-weight:950; margin-top:3px; }
+
+.bp-help{
+  margin-top:12px;
+  background:#0f172a;
+  color:#fff;
+  padding:10px 12px;
+  border-radius:14px;
+  font-weight:750;
+  font-size:0.9rem;
+  opacity:0.95;
+}
+
+/* droite */
+.bp-right{
+  background:linear-gradient(135deg, rgba(27,148,234,0.16), rgba(130,176,239,0.40));
+  border-left:2px dashed rgba(0,0,0,0.14);
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+}
+
+.bp-qrCard{
+  width:100%;
+  background:#fff;
+  border-radius:18px;
+  padding:12px;
+  box-shadow:0 14px 28px rgba(0,0,0,0.18);
+  border:1px solid rgba(0,0,0,0.06);
+}
+
+.bp-qrTop{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-bottom:10px;
+}
+.dot{
+  width:8px; height:8px; border-radius:99px;
+  background:rgba(0,0,0,0.14);
+}
+.bp-qrTxt{
+  margin-left:auto;
+  font-weight:950;
+  font-size:0.75rem;
+  letter-spacing:0.18em;
+  color:#111;
+}
+
+#qrCanvas{
+  width:50%;
+  height:auto;
+  border-radius:12px;
+  background:#fff;
+  image-rendering: pixelated;
+  padding-left: 5%;
+  margin-left: 80px;
+
+}
+
+.bp-qrFoot{
+  margin-top:10px;
+  font-weight:850;
+  font-size:0.82rem;
+  color:#334155;
+  text-align:center;
+  margin-right: 8%;
+}
+
+.bp-mini{
+  width:100%;
+  background:rgba(255,255,255,0.65);
+  border:1px solid rgba(0,0,0,0.06);
+  border-radius:14px;
+  padding:10px;
+}
+
+@media (max-width: 760px){
+  .bp{ grid-template-columns: 1fr; }
+  .bp-right{ border-left:none; border-top:2px dashed rgba(0,0,0,0.14); }
+}
+
+/* Dans la modal: le ticket devient vertical */
+.modal .bp{
+  grid-template-columns: 1fr;   /* 1 seule colonne */
+}
+
+/* La partie QR passe en dessous */
+.modal .bp-right{
+  border-left: none;
+  border-top: 2px dashed rgba(0,0,0,0.14);
+  width: 100%;
+}
+
+
+
+
+
+
+
+/*HAJAR*/
+
+   /* ====== MODAL POUR LOGIN/SIGN IN ====== */
+    /* Container de fond */
+/* 1. CONTAINER EXTERNE : Fond sombre et centrage */
+.modal-extern {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: none; /* Changé en 'flex' par le JS lors de l'ouverture */
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+  backdrop-filter: blur(5px);
+}
+
+/* 2. LA MODALE : Structure Flexbox */
+.modal-content {
+  display: flex; /* Aligne sidebar et formulaire côte à côte */
+  flex-direction: row;
+  background: #ffffff;
+  width: 850px;
+  max-width: 95vw;
+  height: 520px;
+  border-radius: 30px;
+  overflow: hidden;
+  padding: 0 !important; /* Crucial pour que les éléments ne flottent pas */
+  position: relative;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+}
+
+/* 3. SIDEBAR BLEUE : Panneau gauche */
+.auth-sidebar {
+  flex: 1; /* Occupe la partie gauche */
+  background: linear-gradient(135deg, #007bff 0%, #003399 100%);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Bulles décoratives dynamiques */
+.auth-sidebar::before {
+  content: "";
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  top: -50px;
+  left: -50px;
+}
+
+.auth-sidebar h1 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  margin: 0;
+}
+
+/* 4. FORMULAIRE : Partie droite */
+.auth-form-container {
+  flex: 1.2; /* Donne plus d'espace aux inputs */
+  padding: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+/* Correction du titre et sous-titre */
+.auth-form-container h2 {
+  color: #1a3a5f;
+  font-size: 2.2rem;
+  font-weight: 800;
+  margin: 0 0 5px 0;
+  text-align: left;
+}
+
+.auth-subtitle {
+  color: #64748b;
+  font-size: 0.9rem;
+  margin-bottom: 25px;
+  text-align: left;
+}
+
+/* 5. INPUTS ET BOUTONS */
+#login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#login-form input {
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  background: #f1f5f9; /* Fond gris clair */
+  border-radius: 12px;
+  font-size: 1rem;
+  transition: 0.3s;
+}
+
+#login-form input:focus {
+  background: #ffffff;
+  box-shadow: 0 0 0 2px #007bff;
+  outline: none;
+}
+
+/* Bouton principal */
+#login-form button[type="submit"] {
+  background: #1a3a5f;
+  color: white;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s;
+}
+
+#login-form button[type="submit"]:hover {
+  background: #0044cc;
+}
+
+/* 6. ÉLÉMENTS SUPPLÉMENTAIRES */
+.separator {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 15px 0;
+  color: #94a3b8;
+  font-size: 0.8rem;
+}
+
+.separator::before, .separator::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #e2e8f0;
+}
+.separator:not(:empty)::before { margin-right: 1em; }
+.separator:not(:empty)::after { margin-left: 1em; }
+
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  padding: 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  color: #1a3a5f;
+  cursor: pointer;
+}
+
+/* Croix de fermeture */
+.close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: #94a3b8;
+  cursor: pointer;
+  z-index: 10;
+}
+   /* ====== DRAWER POUR ABOUT US ====== */
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: -50%; /* Largeur réduite pour une petite fenêtre */
+      width: 50%;
+      height: 70%;
+      background: linear-gradient(135deg, #1b94ea, #0b5fb8); 
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+      transition: left 0.3s ease;
+      z-index: 1001;
+      padding: 2rem;
+      overflow-y: auto;
+      margin-top:10%;
+      border-radius: 12px;
+    }
+    .drawer.open {
+      left: 0;
+    }
+    .drawer h2 {
+      margin-top: 0;
+      color: white;
+    }
+    .drawer p,ul {
+      color: white;
+      line-height: 1.6;
+    }
+    .close-drawer {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: white;
+    }
+    /* Grille pour les multiples choix de paiement */
+.card-selector {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 colonnes pour rester compact */
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.card-type {
+    border: 2px solid #eee;
+    border-radius: 15px;
+    padding: 12px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.3s ease;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-type img {
+    height: 30px;
+    margin-bottom: 5px;
+    filter: grayscale(100%);
+    transition: filter 0.3s;
+}
+
+.card-type span {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 600;
+}
+
+/* État sélectionné */
+.card-type.selected {
+    border-color: #1b94ea;
+    background: #f0f8ff;
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(27, 148, 234, 0.2);
+}
+
+.card-type.selected img {
+    filter: grayscale(0%); /* La couleur revient au clic */
+}
+
+.card-type.selected span {
+    color: #1b94ea;
+ }
+
+
+/* MODALE FORMULAIRE CLIENT */
+.checkout-modal {
+    background: white;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 25px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.checkout-modal input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+#summary-zone {
+    background: #f1f8fe;
+    padding: 15px;
+    border-radius: 15px;
+    margin-top: 15px;
+    display: none; /* Caché au début */
+}
+
+.step-title {
+    color: #1b94ea;
+    font-weight: 800;
+    margin-bottom: 20px;
+}
+
+.dest-desc{
+  color: #444;
+  margin-bottom: 20px;
+}
+
+.buy-btn{
+  width: 100%;
+  padding: 14px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg,#1b94ea,#82b0ef);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.buy-btn:hover{
+  transform: translateY(-2px);
+}
+
+.dest-close{
+  position: absolute;
+  top: 10px;
+  right: 16px;
+  font-size: 26px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+#results-container {
+  display: grid;
+  /* Force exactement 2 colonnes de taille égale */
+  grid-template-columns: repeat(2, 1fr); 
+  gap: 25px;
+  padding: 40px 20px;
+  
+  /* Centrage du conteneur lui-même */
+  max-width: 800px; /* Ajustez selon la largeur voulue pour 2 cadres */
+  margin: 0 auto;   
+  
+  background: #f9f9f9;
+}
+/* Animation de flottement doux */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Animation pour réduire l'image */
+.img-shrink {
+    height: 120px !important; /* L'image passe de 250px à 120px */
+    transition: height 0.4s ease;
+}
+
+/* On cache la description ou les hôtels pour gagner de la place */
+.hide-on-select {
+    display: none;
+}
+
+
+/* Conteneur des boutons de choix */
+/* Container des boutons */
+.ticket-options {
+    display: flex;
+    gap: 20px;
+    margin-top: 25px;
+    justify-content: center;
+}
+
+/* Base commune innovante */
+.opt-btn {
+    flex: 1;
+    padding: 15px 20px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Style VIP : Effet Or & Nuit */
+.vip-style {
+    background: linear-gradient(135deg, #1a1a1a 0%, #3a3a3a 100%);
+    color: #ffd700;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2), inset 0 0 10px rgba(255, 215, 0, 0.1);
+}
+
+.vip-style:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 25px rgba(255, 215, 0, 0.3);
+    background: linear-gradient(135deg, #2a2a2a 0%, #4a4a4a 100%);
+    border-color: #ffd700;
+}
+
+/* Style Normal : Effet Bleu Cristal */
+.norm-style {
+    background-color: rgba(19, 142, 230, 0.05);
+    color: #1b94ea;
+    border: 2px solid #1b94ea;
+}
+
+.norm-style:hover {
+    transform: translateY(-5px) scale(1.05);
+    background: #1b94ea;
+    color: white;
+    box-shadow: 0 12px 25px rgba(27, 148, 234, 0.3);
+}
+
+/* Petit reflet brillant qui passe sur le bouton au hover */
+.opt-btn::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -60%;
+    width: 20%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: rotate(30deg);
+    transition: all 0.6s ease;
+}
+
+.opt-btn:hover::after {
+    left: 120%;
+}
+/* Style pour les options de flexibilité */
+/* Ciblez bien la classe de votre fenêtre blanche (ex: .details-modal ou .checkout-modal) */
+.details-modal, .checkout-modal {
+    background: white;
+    width: 95%;
+    max-width: 500px;
+    border-radius: 25px;
+    position: relative;
+    
+    /* --- LA SOLUTION ICI --- */
+    display: flex !important;
+    flex-direction: column !important;
+    max-height: 85vh !important; /* Limite la hauteur à 85% de l'écran */
+    overflow-y: auto !important;  /* Active le scroll vertical interne */
+    overflow-x: hidden !important;
+    
+    /* Empêche la modale de remonter trop haut */
+    margin: auto; 
+}
+
+/* On s'assure que le container dynamique ne force pas une taille immense */
+#dynamic-details-area {
+    width: 100%;
+    flex-grow: 1;
+}
+
+/* Pour que la barre de défilement soit invisible ou très fine */
+.details-modal::-webkit-scrollbar {
+    width: 5px;
+}
+.details-modal::-webkit-scrollbar-thumb {
+    background: #1b94ea;
+    border-radius: 10px;
+}
+.flex-box {
+    background: #f8f9fa;
+    border-radius: 15px;
+    padding: 15px;
+    margin-top: 15px;
+    border: 1px solid #eee;
+}
+
+.flex-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.flex-item {
+    flex: 1;
+}
+
+.flex-item label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: bold;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.flex-input {
+    width: 100%;
+    padding: 10px;
+    border: 1.5px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    transition: 0.3s;
+}
+
+.flex-input:focus {
+    border-color: #1b94ea;
+    outline: none;
+}
+
+.option-check {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #eafaf1;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer;
+    border: 1px solid #d4efdf;
+}
+
+.total-zone {
+    background: #fff;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+/* Zone de détails qui s'affiche après le clic */
+#dynamic-details-area {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+    border-left: 5px solid #1b94ea;
+    display: none; /* Caché par défaut */
+}
+
+.price-tag {
+    font-size: 1.2rem;
+    color: #e74c3c;
+    font-weight: 800;
+}
+/* MODALE DE DÉTAILS (SEMI-PAGE AU CENTRE) */
+.details-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: none; /* Caché par défaut */
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    backdrop-filter: blur(5px);
+}
+
+.details-modal {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 25px;
+    overflow: hidden;
+    position: relative;
+    animation: modalSpring 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes modalSpring {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.details-modal img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+}
+
+.details-body {
+    padding: 25px;
+}
+
+.details-body h2 {
+    margin: 0 0 10px;
+    color: #138de4;
+}
+
+.details-info {
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.details-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #e63946;
+    margin-bottom: 15px;
+}
+
+.close-details {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+.city-exploration-container {
+    perspective: 1500px;
+    padding: 50px 0;
+    display: flex;
+    justify-content: center;
+}
+
+.carousel-3d {
+    perspective: 2000px;
+    width: 100%;
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: visible;
+}
+
+.carousel-track {
+    width: 280px;
+    height: 400px;
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.place-card-3d {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* Fond Bleu très pâle (Ciel de cristal) */
+    background-color: #f0f7ff;
+    
+    /* Double bordure : la bordure principale en bleu acier léger */
+    border: 1px solid #c5d7e8; /* Un marron chaud et élégant */
+    
+    /* Coins arrondis prononcés */
+    border-radius: 40px;
+    
+    box-shadow: 0 15px 40px #e2d7c7 ;
+    border-radius: 20px;
+    padding: 15px;
+    color: white;
+    box-sizing: border-box;
+    text-align: center;
+    transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1); /* Animation fluide */
+    backface-visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* La ligne marron intérieure (effet de cadre dans le cadre) */
+.place-card-3d::before {
+    content: "";
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+   border: 2px solid #1a3a5f;
+    border-radius: 32px;
+    pointer-events: none;
+}
+.place-card-3d img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 25px; /* Image bien arrondie au centre */
+    margin-top: 10px;
+    display: block;
+    /* Luminosité naturelle pour la visibilité */
+    filter: brightness(1.02) contrast(1.02);
+}
+.place-card-3d h3 {
+    color: #1a3a5f;
+    font-family: 'Times New Roman', serif; /* Police élégante type magazine */
+    font-size: 1.8rem;
+    margin: 10px 0 5px 0;
+    font-weight: bold;
+}
+
+/* Sous-titre (ex: "Iows Mernri") */
+.place-card-3d p {
+    color: #5c7b99;
+    font-size: 1rem;
+    margin-bottom: 20px;
+    font-family: serif;
+}
+/* Effet au survol : on stabilise la carte et on l'éclaire */
+.place-card-3d:hover {
+    filter: brightness(1.1);
+    transform: scale(1.02) !important; /* Petit zoom de focus */
+    z-index: 500 !important;
+}
+/* Position 0 : CENTRE (Devant) */
+.place-card-3d[data-pos="0"] {
+    transform: translateX(0) translateZ(400px);
+    z-index: 100;
+    opacity: 1;
+    filter: brightness(1);
+}
+
+/* Position 1 : DROITE */
+.place-card-3d[data-pos="1"] {
+    transform: translateX(380px) translateZ(100px);
+    z-index: 50;
+    opacity: 0.8;
+    filter: brightness(0.7) scale(0.85);
+}
+
+/* Position 2 : FOND (Derrière celle du centre) */
+.place-card-3d[data-pos="2"] {
+    transform: translateX(0) translateZ(-300px);
+    z-index: 10;
+    opacity: 0.4;
+    filter: brightness(0.3) scale(0.7);
+}
+
+/* Position 3 : GAUCHE */
+.place-card-3d[data-pos="3"] {
+    transform: translateX(-380px) translateZ(100px);
+    z-index: 50;
+    opacity: 0.8;
+    filter: brightness(0.7) scale(0.85);
+}
+
+.btn-details {
+   background: linear-gradient(135deg, #1b94ea, #0056b3)!important;
+    color: #1a3a5f !important;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+    width: 85%;
+    pointer-events: all
+}
+.btn-close-home {
+    /* Style de base : Transparent et élégant */
+    background: transparent;
+    color: #5c7b99; /* Reprend le bleu gris de vos cartes */
+    border: 1.5px solid #c5d7e8;
+    
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-family: 'Times New Roman', serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin: 25px auto 10px auto;
+    
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Effet au survol (Hover) */
+.btn-close-home:hover {
+    background-color: #ffffff;
+    color: #1a3a5f; /* Bleu marine profond pour le contraste */
+    border-color: #1a3a5f;
+    box-shadow: 0 10px 25px rgba(26, 58, 95, 0.1);
+    transform: translateY(-3px);
+}
+
+/* L'icône de la petite maison ou flèche */
+.btn-close-home::before {
+    content: "←"; /* Flèche de retour élégante */
+    font-size: 1.2rem;
+    transition: transform 0.4s ease;
+}
+
+.btn-close-home:hover::before {
+    transform: translateX(-5px); /* Petit mouvement vers la gauche au survol */
+}
+
+/* Petit reflet de lumière discret */
+.btn-close-home::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, transparent, rgba(255,255,255,0.6), transparent);
+    top: 0;
+    left: -100%;
+    transition: 0.6s;
+}
+
+.btn-close-home:hover::after {
+    left: 100%;
+}
+/* L'overlay qui couvre TOUT */
+/* ============================================================
+   1. OVERLAY DE FOND (L'écran qui devient sombre)
+   ============================================================ */
+.modal-success-overlay {
+    position: fixed !important; /* Sort l'élément du bas de page */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8); /* Fond sombre pour le focus */
+    display: none; /* Masqué par défaut, affiché par showSuccess() */
+    justify-content: center;
+    align-items: center;
+    z-index: 999999;
+    overflow-y: auto; /* Par-dessus tout le reste du site */
+    padding:20px;
+    backdrop-filter: blur(5px);
+}
+.success-card {
+    background: white !important;
+    padding: 30px !important;
+    border-radius: 25px !important;
+    width: 90% !important;
+    max-width: 380px !important;
+    text-align: center !important;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 15px !important;
+    position: relative !important;
+}
+
+/* ============================================================
+   3. SECTION DES POINTS (+150 GAGNÉS)
+   ============================================================ */
+.reward-section {
+    background: #fffef0 !important;
+    border: 2px dashed #eac11b !important;
+    padding: 20px !important;
+    border-radius: 15px !important;
+}
+
+.points-display {
+    color: #b37a00 !important;
+    font-size: 2rem !important;
+    font-weight: 900 !important;
+    margin: 0 !important;
+}
+
+/* ============================================================
+   4. ZONE DE RATING (LES ÉTOILES) - LA CAUSE DU PROBLÈME
+   ============================================================ */
+.rating-container {
+    margin: 10px 0 !important;
+}
+
+.rating-container p {
+    color: #0929dd !important;
+    font-weight: 600 !important;
+    margin-bottom: 15px !important;
+}
+
+.star-group {
+    display: flex !important;
+    justify-content: center !important;
+    gap: 12px !important;
+}
+
+.star-item {
+    font-size: 2.8rem !important; /* Très grande taille pour la voir */
+    color: #cbd5e1 !important; /* Gris clair par défaut */
+    cursor: pointer !important;
+    transition: transform 0.2s, color 0.2s !important;
+    line-height: 1 !important;
+}
+
+/* Couleur dorée quand l'étoile est sélectionnée par le JS */
+.star-item.selected {
+    color: #eac11b !important;
+    transform: scale(1.1) !important;
+}
+/* ============================================================
+   6. NOTIFICATION BLEUE (TOAST FINAL EN BAS)
+   ============================================================ */
+.points-toast {
+    position: fixed !important;
+    bottom: -100px; /* Caché sous l'écran au début */
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: #1a3a5f !important;
+    color: white !important;
+    padding: 15px 35px !important;
+    border-radius: 50px !important;
+    z-index: 1000000 !important;
+    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+}
+
+.points-toast.show {
+    bottom: 40px !important; /* Remonte en bas de l'écran */
+}
+.close-rating {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: color 0.2s;
+    line-height: 1;
+}
+
+.close-rating:hover {
+    color: #1e293b; /* Devient plus sombre au survol */
+}
+
+/* TICKET DESIGN */
+.boarding-pass {
+    background: white;
+    width: 350px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    position: relative;
+}
+.ticket-header {
+    background: #1b94ea;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.ticket-body { padding: 20px; }
+.ticket-row { display: flex; justify-content: space-between; margin-bottom: 20px; }
+.item span { display: block; font-size: 0.6rem; color: #94a3b8; }
+.ticket-main { display: flex; justify-content: space-between; align-items: center; margin: 20px 0; border-top: 1px dashed #e2e8f0; border-bottom: 1px dashed #e2e8f0; padding: 20px 0; }
+.city { font-size: 2rem; font-weight: 800; color: #1e293b; }
+.barcode { text-align: center; margin-top: 20px; font-family: monospace; letter-spacing: 2px; }
+
+/* GUIDE DESIGN */
+.guide-card {
+    background: white;
+    width: 90%;
+    max-width: 400px;
+    border-radius: 25px;
+    overflow: hidden;
+    position: relative;
+}
+.guide-header { background: #27ae60; color: white; padding: 30px 20px; text-align: center; }
+.guide-content { padding: 20px; max-height: 400px; overflow-y: auto; }
+.guide-content section { margin-bottom: 15px; border-left: 3px solid #27ae60; padding-left: 10px; }
+.guide-content h4 { margin: 0; font-size: 0.8rem; color: #27ae60; }
+#ticket-modal, #guide-modal {
+    z-index: 2000000 !important; /* Supérieur au success-overlay */
+}
+@media print {
+    body * {
+        visibility: hidden; /* Cache tout le site */
+    }
+    #ticket-modal, #ticket-modal * {
+        visibility: visible; /* Montre le modal */
+    }
+    #ticket-modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        display: flex !important;
+        justify-content: center;
+    }
+    .modal-success-overlay {
+        background: white !important;
+        backdrop-filter: none !important;
+    }
+}
+/* Boutons sous le ticket */
+.ticket-actions button {
+    padding: 12px 25px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-print { background: #1b94ea; color: white; }
+.btn-print:hover { background: #167bc4; transform: scale(1.05); }
+
+.btn-close-ticket { background: rgba(255,255,255,0.2); color: white; border: 1px solid white !important; }
+
+/* CONFIGURATION IMPRESSION */
+@media print {
+    /* Cache tout sauf le ticket */
+    body * { visibility: hidden; }
+    #ticket-modal, #ticket-modal .boarding-pass-horizontal, #ticket-modal .boarding-pass-horizontal * {
+        visibility: visible;
+    }
+    
+    #ticket-modal {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: white !important;
+        display: flex !important;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ticket-actions, .close-rating { display: none !important; }
+
+    /* Force le format paysage pour le ticket rectangulaire */
+    @page { size: landscape; margin: 0; }
+}.boarding-pass-horizontal {
+    display: flex;
+    width: 700px; /* Format rectangulaire */
+    height: 250px;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.ticket-left {
+    flex: 3;
+    padding: 20px;
+    border-right: 2px dashed #cbd5e1;
+    position: relative;
+}
+
+.ticket-right {
+    flex: 1;
+    background: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.ticket-header-h {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #1b94ea;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.agency-name { color: #1b94ea; font-weight: bold; }
+
+.flight-path {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.city-block strong { font-size: 2.5rem; color: #1e293b; }
+
+.flight-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 20px;
+}
+
+.detail-item label { display: block; font-size: 0.7rem; color: #64748b; }
+@media print {
+    /* QR Code Style */
+.qr-code {
+    width: 80px;
+    height: 80px;
+    background: #1e293b;
+    border: 4px solid white;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px;
+}
+.qr-pixel { background: white; }
+    
+    img {
+        -webkit-print-color-adjust: exact; /* Force l'impression des couleurs et images */
+        print-color-adjust: exact;
+    }
+}
+.checklist-section {
+    margin-top: 20px;
+    background: #fdfdfd;
+    border-radius: 12px;
+    padding: 15px;
+    border: 1px solid #edf2f7;
+}
+.checklist-container {
+    max-height: 250px; /* Évite que le guide ne devienne trop long */
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+/* Style pour la barre de défilement fine */
+.checklist-container::-webkit-scrollbar {
+    width: 4px;
+}
+.checklist-container::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+/* Container des items */
+.checklist-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+/* Style de la ligne entière */
+.check-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px 15px;
+    background: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.check-item:hover {
+    background: #f8fafc;
+    border-color: #1b94ea;
+    transform: translateX(5px);
+}
+
+/* Cacher la checkbox par défaut */
+.check-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 22px;
+    height: 22px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+    flex-shrink: 0; /* Empêche la checkbox de s'écraser */
+}
+
+/* État Coché */
+.check-item input[type="checkbox"]:checked {
+    background: #1b94ea;
+    border-color: #1b94ea;
+}
+
+/* Le petit "V" de validation */
+.check-item input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    color: white;
+    font-size: 14px;
+    font-weight: 800;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Texte barré et grisé quand coché */
+.check-item input:checked + span {
+    text-decoration: line-through;
+    color: #94a3b8;
+    font-weight: 400;
+}
+
+/* Mise en avant du texte non coché */
+.check-item span {
+    font-size: 0.9rem;
+    color: #334155;
+    font-weight: 500;
+    transition: 0.3s;
+}
+/* FIN HAJAR */
+
+
+
+/*OMAIMA*/
+
+/* Ensure the hero header allows absolute positioning inside it */
+.hero {
+  position: relative;
+}
+
+/* Position the selector at the absolute top-left */
+.reservation-selector {
+  position: absolute;
+  top: 20px;   /* Distance from the very top */
+  left: 20px;  /* Distance from the very left */
+  z-index: 999; /* Ensures it stays above all other elements */
+}
+
+/* Basic styling to make it look clean */
+#booking-type {
+  padding: 10px 15px;
+  border-radius: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.2); /* Semi-transparent */
+  color: white; /* Change to black if your background is light */
+  backdrop-filter: blur(8px); /* Modern glass effect */
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* Fixes the text color of the dropdown options so they are readable */
+#booking-type option {
+  color: #333;
+  background: #fff;
+}
+/* ===== COMMENT SECTION ===== */
+.testimonials {
+  padding: 80px 20px;
+  background: linear-gradient(180deg, #f7fbff, #ffffff);
+}
+
+.testimonials h2 {
+  text-align: center;
+  font-size: 2.6rem;
+  font-weight: 800;
+  margin-bottom: 50px;
+}
+
+.testimonials h2 span {
+  color: #1b94ea;
+}
+
+.testimonial-grid {
+  max-width: 1200px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 30px;
+}
+
+.testimonial-card {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 25px 22px 28px;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-8px);
+}
+
+.testimonial-card::before {
+  content: "“";
+  position: absolute;
+  top: -18px;
+  left: 20px;
+  font-size: 4rem;
+  color: #1b94ea;
+  font-weight: 900;
+}
+
+.testimonial-text {
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.testimonial-user {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.testimonial-user img {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #1b94ea;
+}
+
+.testimonial-user h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.testimonial-user span {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+.stars {
+  margin-top: 6px;
+  color: #f5b50a;
+  font-size: 1rem;
+}
+/* ===== FLOATING MEMORIES BUTTON ===== */
+.memories-btn {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  padding: 14px 22px;
+  background: linear-gradient(135deg, #f5c16c, #f08a5d);
+  color: #3b2f2f;
+  font-weight: 800;
+  border-radius: 999px;
+  text-decoration: none;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  z-index: 5000;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.memories-btn:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+}
+
+/* ===== TRAVEL QUIZ FOOTER ===== */
+.quiz-footer {
+  background: linear-gradient(135deg, #1b94ea, #82b0ef);
+  padding: 60px 20px;
+  text-align: center;
+  color: #ffffff;
+  margin-top: 80px;
+}
+
+.quiz-footer-content {
+  max-width: 700px;
+  margin: auto;
+}
+
+.quiz-footer h3 {
+  font-size: 2.2rem;
+  margin-bottom: 12px;
+  font-weight: 800;
+}
+
+.quiz-footer p {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  opacity: 0.95;
+  margin-bottom: 28px;
+}
+
+.quiz-btn {
+  display: inline-block;
+  padding: 14px 32px;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #1b94ea;
+  font-size: 1.05rem;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.quiz-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.35);
+}
+
+/* CTA Section */
+.timeline-cta {
+  background: linear-gradient(135deg, #118ab2, #ef476f);
+  color: #fff;
+  text-align: center;
+  padding: 80px 20px;
+  border-radius: 25px;
+  margin: 60px auto;
+  max-width: 900px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  transition: transform 0.3s ease;
+}
+.timeline-cta:hover {
+  transform: translateY(-5px);
+}
+.timeline-cta h2 {
+  font-size: 2.2em;
+  margin-bottom: 20px;
+  font-weight: 700;
+}
+.timeline-cta p {
+  font-size: 1.2em;
+  margin-bottom: 35px;
+  line-height: 1.5;
+}
+.cta-btn {
+  display: inline-block;
+  padding: 15px 30px;
+  font-size: 1em;
+  font-weight: 700;
+  color: #118ab2;
+  background: #fff;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+.cta-btn:hover {
+  background: #073b4c;
+  color: #fff;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/*___________________________________________________*/
+
+
+
+
+  </style>
+</head>
+
+<body>
+
+  <header class="hero">
+    <!----------------------------------------------------------O M A I M A----------------------------------------------------------------------->
+     <div class="reservation-selector">
+    <select id="booking-type" name="booking-type">
+      <option value="" disabled selected>Reserve a...</option>
+      <option value="car">🚗 Rent a Car</option>
+      <option value="hotel">🏨 Hotel Room</option>
+      <option value="guide">🗺️ Tour Guide</option>
+    </select>
+    <!------------------------------------------------ rental of hotel, car, guide--------------------------------------------------------------------->
+  </div>
+    <nav class="main_nav">
+      <a href="#">Accueil</a>
+      <a href="#" id="contact-btn">Contact Us</a>
+      <a href="#" id="signin-link">Sign in</a>
+      <a href="#" id="login-link">Login</a>
+      <a href="#" id="about-link">About Us</a>
+    </nav>
+<!--H A J A R-->
+<!--HAJAR-->
+
+  <!-- MODAL POUR LOGIN/SIGN IN -->
+  <div class="modal-extern" id="login-modal">
+  <div class="modal-content">
+    <div class="auth-sidebar">
+      <h1>WELCOME</h1>
+      <p>Your journey starts here.</p>
+    </div>
+
+    <div class="auth-form-container">
+      <button class="close" id="close-modal">&times;</button>
+      
+      <h2>Login / Sign In</h2>
+      <p class="auth-subtitle">Enter your details to access your account</p>
+
+      <form id="login-form">
+        <input type="email" placeholder="Enter your email here" required>
+        <input type="password" placeholder="Enter your password here" required>
+        <button type="submit">Login</button>
+        
+        <div class="separator">or</div>
+        
+        <button type="button" class="btn-google" onclick="handleGoogleLogin()">
+          <img src="https://www.gstatic.com/images/branding/product/1x/gsa_512dp.png" class="google-icon" width="18">
+          Sign in with Google
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+  <div class="drawer" id="about-drawer">
+    <button class="close-drawer" id="close-drawer">&times;</button>
+    <h2>About Our Agency</h2>
+    <p>Welcome to Discover the World, your premier travel agency dedicated to crafting unforgettable adventures. Founded in 2010, we specialize in personalized travel experiences that cater to your unique interests and preferences.</p>
+    <ul>
+      <li>Customized itineraries</li>
+      <li>Flight and hotel bookings</li>
+      <li>Adventure tours</li>
+      <li>Cultural experiences</li>
+      <li>Group travel packages</li>
+    </ul>
+    
+  </div>
+  <!-- FIN LOGIN -->
+<!------------------------------------------------------->
+    <div class="hero-content">
+      <h1>Discover the World</h1>
+      <p>Plan your next adventure with us</p>
+
+      <div class="search-wrapper">
+        <input
+          type="text"
+          id="search-input"
+          placeholder="Search a city..."
+          autocomplete="off">
+        <div id="suggestions"></div>
+      </div>
+    </div>
+
+    <div class="hero-tear">
+      <svg viewBox="0 0 1440 160" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#ffffff"
+          d="M0,120 C 90,140 180,100 270,115 C 360,130 450,80 540,110 C 630,140 720,90 810,115 C 900,140 990,100 1080,115 C 1170,130 1260,110 1350,120 L1440,130 L1440,160 L0,160 Z"/>
+      </svg>
+    </div>
+  </header>
+
+  <!-- CONTACT OVERLAY -->
+  <div class="contact-overlay" id="contact-overlay">
+    <div class="contact-modal">
+      <button class="contact-close" id="contact-close">×</button>
+
+      <span class="badge">Contact</span>
+      <h2>OHA Travel Agency</h2>
+      <p>We'll respond quickly, we promise.</p>
+
+      <div class="contact-row">
+        <div class="contact-icon">📧</div>
+        <p>contact@ohaagency.com</p>
+      </div>
+
+      <div class="contact-row">
+        <div class="contact-icon">📞</div>
+        <p>+212 6 44 55 66 77</p>
+      </div>
+
+      <div class="contact-row">
+        <div class="contact-icon">📍</div>
+        <p>Marrakech, Maroc</p>
+      </div>
+
+      <div style="margin-top:10px;">
+        <label for="msg" style="font-size:0.85rem;">Leave us a message:</label>
+        <textarea id="msg" placeholder="Your question, destination, dates..."></textarea>
+      </div>
+
+      <p id="contact-success" style="display:none;margin-top:10px;font-size:0.9rem;background:rgba(255,255,255,0.2);padding:8px 12px;border-radius:10px;text-align:center;">
+        ✅ Your message has been sent successfully.
+      </p>
+
+      <button class="send-btn" id="send-message">Send</button>
+    </div>
+  </div>
+
+
+
+
+  <main>
+    <section class="polaroid-section">
+      <h2 class="section-title">
+        Explore Our <span>Top Deals</span> & <span>Most Visited</span> Destinations
+      </h2>
+
+      <div class="marquee">
+        <div class="track" id="track">
+
+          <!-- CARD 1 -->
+          <article class="polaroid"
+            data-title="Paris"
+            data-img="Paris.jpg"
+            data-old="1200"
+            data-new="600"
+            data-dates="12–18 July 2025"
+            data-desc="City of love with guided tours, hotels and unforgettable experiences."
+            data-rating="4.8"
+            data-duration="6"
+            data-left="3"
+            data-included="Flight + Hotel">
+            <span class="tag discount">-50%</span>
+            <span class="tag visited">Most visited</span>
+            <img src="Paris.jpg" alt="Paris">
+            <div class="card-body">
+              <p class="caption">Paris</p>
+              <div class="mini-infos">
+                <span class="chip">⭐ <b>4.8</b></span>
+                <span class="chip">⏱ <b>6</b> days</span>
+                <span class="chip">🏷 City</span>
+              </div>
+              <div class="price-mini">
+                <span class="old">1200€</span>
+                <span class="new"><b>600€</b></span>
+              </div>
+              <div class="stockline">
+                <span>🎟️ <b>3</b> seats left</span>
+                <span class="inc">✅ Flight + Hotel</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- CARD 2 -->
+          <article class="polaroid"
+            data-title="Marrakech"
+            data-img="Marakech.jpg"
+            data-old="2200"
+            data-new="900"
+            data-dates="14–18 July 2025"
+            data-desc="Culture, souks, desert experience and luxury riads."
+            data-rating="4.6"
+            data-duration="5"
+            data-left="6"
+            data-included="Hotel + Tour">
+            <span class="tag discount">-40%</span>
+            <span class="tag ticket">Best deal</span>
+            <img src="Marakech.jpg" alt="Marrakech">
+            <div class="card-body">
+              <p class="caption">Marrakech</p>
+              <div class="mini-infos">
+                <span class="chip">⭐ <b>4.6</b></span>
+                <span class="chip">⏱ <b>5</b> days</span>
+                <span class="chip">🏷 Culture</span>
+              </div>
+              <div class="price-mini">
+                <span class="old">2200€</span>
+                <span class="new"><b>900€</b></span>
+              </div>
+              <div class="stockline">
+                <span>🎟️ <b>6</b> seats left</span>
+                <span class="inc">✅ Hotel + Tour</span>
+              </div>
+            </div>
+          </article>
+
+         <!-- CARD 3: New York -->
+<article class="polaroid"
+  data-title="New York"
+  data-img="newyork.jpg"
+  data-old="1800"
+  data-new="1100"
+  data-dates="05–11 Aug 2025"
+  data-desc="Skyscrapers, Times Square, Central Park and a city that never sleeps."
+  data-rating="4.7"
+  data-duration="7"
+  data-left="4"
+  data-included="Flight + Hotel">
+  <span class="tag discount">-39%</span>
+  <span class="tag visited">Most visited</span>
+  <img src="newyork.jpg" alt="New York">
+
+  <div class="card-body">
+    <p class="caption">New York</p>
+
+    <div class="mini-infos">
+      <span class="chip">⭐ <b>4.7</b></span>
+      <span class="chip">⏱ <b>7</b> days</span>
+      <span class="chip">🏷 City</span>
+    </div>
+
+    <div class="price-mini">
+      <span class="old">1800€</span>
+      <span class="new"><b>1100€</b></span>
+    </div>
+
+    <div class="stockline">
+      <span>🎟️ <b>4</b> seats left</span>
+      <span class="inc">✅ Flight + Hotel</span>
+    </div>
+  </div>
+</article>
+
+<!-- CARD 4: Dubai -->
+<article class="polaroid"
+  data-title="Dubai"
+  data-img="DUBAI.jpg"
+  data-old="2400"
+  data-new="1500"
+  data-dates="20–25 Sep 2025"
+  data-desc="Luxury hotels, desert safari, Burj Khalifa views and shopping paradise."
+  data-rating="4.5"
+  data-duration="5"
+  data-left="7"
+  data-included="Hotel + Safari">
+  <span class="tag discount">-38%</span>
+  <span class="tag ticket">Best deal</span>
+  <img src="Dubai.jpg" alt="Dubai">
+
+  <div class="card-body">
+    <p class="caption">Dubai</p>
+
+    <div class="mini-infos">
+      <span class="chip">⭐ <b>4.5</b></span>
+      <span class="chip">⏱ <b>5</b> days</span>
+      <span class="chip">🏷 Luxury</span>
+    </div>
+
+    <div class="price-mini">
+      <span class="old">2400€</span>
+      <span class="new"><b>1500€</b></span>
+    </div>
+
+    <div class="stockline">
+      <span>🎟️ <b>7</b> seats left</span>
+      <span class="inc">✅ Hotel + Safari</span>
+    </div>
+  </div>
+</article>
+
+<!-- CARD 5: Bali -->
+<article class="polaroid"
+  data-title="Bali"
+  data-img="Bali.jpg"
+  data-old="2100"
+  data-new="1300"
+  data-dates="10–17 Oct 2025"
+  data-desc="Beaches, rice terraces, temples and a chill vibe with amazing sunsets."
+  data-rating="4.9"
+  data-duration="8"
+  data-left="5"
+  data-included="Flight + Resort">
+  <span class="tag discount">-38%</span>
+  <span class="tag visited">Most visited</span>
+  <img src="Bali.jpg" alt="Bali">
+
+  <div class="card-body">
+    <p class="caption">Bali</p>
+
+    <div class="mini-infos">
+      <span class="chip">⭐ <b>4.9</b></span>
+      <span class="chip">⏱ <b>8</b> days</span>
+      <span class="chip">🏷 Beach</span>
+    </div>
+
+    <div class="price-mini">
+      <span class="old">2100€</span>
+      <span class="new"><b>1300€</b></span>
+    </div>
+
+    <div class="stockline">
+      <span>🎟️ <b>5</b> seats left</span>
+      <span class="inc">✅ Flight + Resort</span>
+    </div>
+  </div>
+</article>
+
+<!-- CARD 6: Santorini -->
+<article class="polaroid"
+  data-title="Santorini"
+  data-img="santorini.jpg"
+  data-old="1600"
+  data-new="980"
+  data-dates="02–07 Jul 2025"
+  data-desc="White houses, blue domes, romantic views and iconic Greek sunsets."
+  data-rating="4.8"
+  data-duration="6"
+  data-left="2"
+  data-included="Hotel + Cruise">
+  <span class="tag discount">-39%</span>
+  <span class="tag ticket">Best deal</span>
+  <img src="Santorini-CreditiStock_Maglara.jpg" alt="Santorini">
+
+  <div class="card-body">
+    <p class="caption">Santorini</p>
+
+    <div class="mini-infos">
+      <span class="chip">⭐ <b>4.8</b></span>
+      <span class="chip">⏱ <b>6</b> days</span>
+      <span class="chip">🏷 Romantic</span>
+    </div>
+
+    <div class="price-mini">
+      <span class="old">1600€</span>
+      <span class="new"><b>980€</b></span>
+    </div>
+
+    <div class="stockline">
+      <span>🎟️ <b>2</b> seats left</span>
+      <span class="inc">✅ Hotel + Cruise</span>
+    </div>
+  </div>
+</article>
+
+
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- WIZARD OVERLAY (UN SEUL) -->
+  <div class="modal-overlay" id="overlay">
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="modal-close" id="closeAll" aria-label="Close">×</button>
+
+      <div class="stepper">
+        <div class="step active" data-step="1"><div class="dot">1</div><span>Details</span></div>
+        <div class="line"></div>
+        <div class="step" data-step="2"><div class="dot">2</div><span>Payment</span></div>
+        <div class="line"></div>
+        <div class="step" data-step="3"><div class="dot">3</div><span>Confirm</span></div>
+        <div class="line"></div>
+        <div class="step" data-step="4"><div class="dot">4</div><span>Done</span></div>
+      </div>
+
+      <div class="banner">
+        <h2 id="bannerTitle">Reservation</h2>
+        <p id="bannerInfo">—</p>
+      </div>
+
+      <!-- STEP 1 -->
+      <section class="pane" id="pane1">
+        <img class="hero" id="dImg" src="" alt="Destination">
+        <div class="pad">
+          <h3 class="dest-title" id="dTitle">—</h3>
+
+          <div class="dest-meta">
+            <span>📅 <b id="dDates">—</b></span>
+            <span>⭐ <b id="dRating">—</b></span>
+            <span>⏱ <b id="dDuration">—</b> days</span>
+          </div>
+
+          <div class="price-row">
+            <span class="price-old" id="dOld">—</span>
+            <span class="price-new" id="dNew">—</span>
+          </div>
+
+          <p class="desc" id="dDesc">—</p>
+
+          <div class="two-badges">
+            <span class="pill" id="dIncluded">✅ Included: —</span>
+            <span class="pill warn" id="dLeft">🎟️ Seats left: —</span>
+          </div>
+
+          <div class="btn-row">
+            <button class="secondary-btn" id="btnClose1">Close</button>
+            <button class="primary-btn" id="btnToPay">Reserve & Pay ✈️</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2 -->
+      <section class="pane" id="pane2" hidden>
+        <form class="form" id="payForm" novalidate>
+          <div class="grid2">
+            <label>Full name
+              <input type="text" id="pName" placeholder="Your name">
+              <small class="err" id="eName"></small>
+            </label>
+
+            <label>Email
+              <input type="email" id="pEmail" placeholder="you@example.com">
+              <small class="err" id="eEmail"></small>
+            </label>
+          </div>
+
+          <div class="grid2">
+            <label>Phone
+              <input type="tel" id="pPhone" placeholder="+212...">
+              <small class="err" id="ePhone"></small>
+            </label>
+
+            <label>Travel class
+              <select id="pClass">
+                <option value="">Choose…</option>
+                <option value="Normal">Normal</option>
+                <option value="Business">Business (+15%)</option>
+                <option value="First Class">First Class (+30%)</option>
+              </select>
+              <small class="err" id="eClass"></small>
+            </label>
+          </div>
+
+          <div class="pay-methods">
+            <p class="pay-title">Payment method 🔒</p>
+            <div class="methods">
+              <button type="button" class="method" data-method="Visa">💳 Visa</button>
+              <button type="button" class="method" data-method="MasterCard">💳 MasterCard</button>
+              <button type="button" class="method" data-method="Bank">🏦 Bank transfer</button>
+            </div>
+            <small class="err" id="eMethod"></small>
+          </div>
+
+          <div class="grid2">
+            <label>Card / RIB number
+              <input type="text" id="pNumber" placeholder="**** **** **** 1234">
+              <small class="hint">We mask it in the summary.</small>
+              <small class="err" id="eNumber"></small>
+            </label>
+
+            <label>Passengers
+              <input type="number" id="pPassengers" min="1" value="1">
+              <small class="err" id="ePassengers"></small>
+            </label>
+          </div>
+
+          <label class="checkline">
+            <input type="checkbox" id="pInsurance" checked>
+            Add travel insurance (+20€ / passenger)
+          </label>
+
+          <div class="summary" id="priceBox"></div>
+
+          <div class="btn-row sticky">
+            <button type="button" class="secondary-btn" id="btnBackToDetails">Back</button>
+            <button type="submit" class="primary-btn" id="btnValidatePay">Validate ✅</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- STEP 3 -->
+      <section class="pane" id="pane3" hidden>
+        <div class="pad">
+          <div class="summary" id="confirmBox"></div>
+
+          <div class="btn-row sticky">
+            <button class="secondary-btn" id="btnEdit">Edit info</button>
+            <button class="primary-btn" id="btnContinue">Confirm & Pay ✅</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 4 -->
+<section class="pane" id="pane4" hidden>
+  <div class="pad">
+    <h3 class="success-title">Done ✅</h3>
+    <p class="oktext">Payment confirmed. Your ticket is ready.</p>
+    
+
+    <div class="ticketbox" id="ticketBox"></div>
+
+    <div class="subttl">Suggestions</div>
+    <div class="suggest-grid" id="suggestGrid"></div>
+
+    <div class="btn-row sticky">
+      <button class="primary-btn" id="btnCloseDone">Close</button>
+    </div>
+  </div>
+</section>
+
+
+    </div>
+  </div>
+
+  <!--                         H A J A R                                              -->
+    <!--hajar-->
+
+<!--a ajouter-->
+
+<div id="target-results" style="padding-top: 20px;">
+    <div class="city-exploration-container">
+        <div class="carousel-3d">
+            <div class="carousel-track" id="cityCarousel">
+                </div>
+        </div>
+    </div>
+</div>
+<div id="results-container"></div>
+<div class="details-overlay" id="details-overlay">
+    <div class="details-modal">
+        <button class="close-details" onclick="closeDetails()">×</button>
+        <div id="modal-content-dynamic">
+            </div>
+    </div>
+</div>
+<div class="details-overlay" id="checkout-overlay" style="display:none;">
+    <div class="checkout-modal">
+        <button class="close-details" onclick="closeCheckout()">×</button>
+        
+  <div id="checkout-step-1">
+    <h2 class="step-title" style="color: #1b94ea; text-align: center;">Payment Method</h2>
+    
+    <div class="card-selector">
+        <div class="card-type" onclick="selectCard(this, 'Visa')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa">
+            <span>Visa</span>
+        </div>
+        <div class="card-type" onclick="selectCard(this, 'Mastercard')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard">
+            <span>Mastercard</span>
+        </div>
+        <div class="card-type" onclick="selectCard(this, 'PayPal')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal">
+            <span>PayPal</span>
+        </div>
+        <div class="card-type" onclick="selectCard(this, 'Amex')">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/American_Express_logo_%282018%29.svg" alt="Amex">
+            <span>Amex</span>
+        </div>
+    </div>
+
+    <input type="text" id="cust-name" placeholder="Full name">
+    <input type="email" id="cust-email" placeholder="E-mail Adress"> <input type="text" id="cust-rib" placeholder="Enter your RIB/Card number" maxlength="24">
+    
+    <button class="buy-btn" onclick="showReview()">Check my information</button>
+</div>
+
+<div id="checkout-step-2" style="display:none;">
+            <h2 class="step-title">Verification</h2>
+            <div id="summary-zone" style="background:#f9f9f9; padding:15px; border-radius:15px; text-align:left; margin-bottom:15px;"></div>
+            <button class="buy-btn" onclick="processFinalPayment()" style="background:#27ae60;">Confirm the payment  </button>
+            <p onclick="backToEdit()" style="text-align:center; color:#1b94ea; cursor:pointer; margin-top:10px; font-size:0.9rem;">Modify my information</p>
+</div>
+</div>
+</div>
+<div id="success-overlay" class="modal-success-overlay">
+    <div class="success-card">
+        <div class="reward-section">
+          <button class="close-rating" onclick="skipRating()">×</button>
+            <h2 class="points-display">+150 Points gagnés !</h2>
+        </div>
+
+        <div class="rating-container">
+            <p>Comment s'est passée votre expérience ?</p>
+            <div class="star-group">
+                <span class="star-item" onclick="setRating(1)">★</span>
+                <span class="star-item" onclick="setRating(2)">★</span>
+                <span class="star-item" onclick="setRating(3)">★</span>
+                <span class="star-item" onclick="setRating(4)">★</span>
+                <span class="star-item" onclick="setRating(5)">★</span>
+            </div>
+        </div>
+        <button class="btn-close-home" onclick="closeAndReturnHome()">
+            CLOSE & RETURN HOME
+        </button>
+    </div>
+    </div>
+    <div id="ticket-modal" class="modal-success-overlay" style="display:none; z-index: 2000001 !important;">
+    <div style="display: flex; flex-direction: column; align-items: center; gap: 20px;">
+        <div class="boarding-pass-horizontal">
+            <button class="close-rating" onclick="closeToolboxModal('ticket-modal')" style="color: #333; position: absolute; right: 15px; top: 10px;">×</button>
+            
+            <div class="ticket-left">
+                <div class="ticket-header-h">
+                    <span class="agency-name">OHA TRAVEL AGENCY</span>
+                    <span class="ticket-type">VIP PASS</span>
+                </div>
+                
+                <div class="ticket-content-h">
+                    <div class="passenger-info">
+                        <label>PASSENGER NAME</label>
+                        <strong id="t-name">CHAKIB ALAOUI</strong>
+                    </div>
+                    
+                    <div class="flight-path">
+                        <div class="city-block">
+                            <small>DESTINATION</small>
+                            <strong id="t-dest">PARIS</strong>
+                        </div>
+                    </div>
+
+                    <div class="flight-details">
+                        <div class="detail-item">
+                            <label>DATE</label>
+                            <strong id="t-date">27 DEC 2025</strong>
+                        </div>
+                        <div class="detail-item">
+                            <label>DAY</label>
+                            <strong id="t-day">SATURDAY</strong>
+                        </div>
+                        <div class="detail-item">
+                            <label>GATE</label>
+                            <strong>A-01</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-right">
+              <div class="qr-container">
+    <div style="background: white; padding: 5px; border-radius: 5px;">
+        <img id="ticket-qr" src="" alt="QR Code" style="width: 85px; height: 85px; display: block;">
+    </div>
+    <small style="font-size: 0.6rem; margin-top: 5px; color: #64748b; font-weight: bold;">SCAN FOR DETAILS</small>
+</div>
+                <div class="stub-info" style="margin-top: 15px; text-align: center;">
+                    <label style="display: block; font-size: 0.6rem;">REWARD</label>
+                    <strong style="color: #1b94ea;">+150 PTS</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="ticket-actions">
+            <button onclick="printTicket()" class="btn-print">📩 Save as PDF / Print</button>
+            <button onclick="closeToolboxModal('ticket-modal')" class="btn-close-ticket">Close</button>
+        </div>
+    </div>
+</div>
+
+<div id="guide-modal" class="modal-success-overlay" style="display:none; z-index: 2000001 !important;">
+    <div class="guide-card">
+        <button class="close-rating" onclick="closeToolboxModal('guide-modal')">×</button>
+        <div class="guide-header" id="g-header">
+            <h2 id="g-title" style="margin:0; color:#1b94ea;">Guide de Voyage</h2>
+        </div>
+        <div class="guide-content">
+            <section style="margin-bottom: 15px;">
+                <h4 style="margin-bottom:5px; color:#334155;">📍 THE ESSENTIALS</h4>
+                <p id="g-essentiel" style="font-size:0.9rem; color:#64748b; line-height:1.4; margin:0;"></p>
+            </section>
+            
+            <section style="margin-bottom: 15px;">
+                <h4 style="margin-bottom:5px; color:#334155;">✨ WHAT TO SEE</h4>
+                <p id="g-voir" style="font-size:0.9rem; color:#64748b; line-height:1.4; margin:0;"></p>
+            </section>
+
+            <section style="margin-bottom: 15px;">
+                <h4 style="margin-bottom:5px; color:#334155;">🍽️ GASTRONOMY</h4>
+                <p id="g-faim" style="font-size:0.9rem; color:#64748b; line-height:1.4; margin:0;"></p>
+            </section>
+
+            <section class="checklist-section" style="border-top: 1px solid #eee pt-15px ;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; margin-top:15px;">
+                    <h4 style="margin:0; color:#334155;">📝 TRAVEL CHECKLIST</h4>
+                    <span id="checklist-percent" style="font-size: 0.7rem; font-weight: bold; color: #1b94ea;">0% Completed</span>
+                </div>
+                
+                <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 10px; margin-bottom: 15px; overflow: hidden;">
+                    <div id="checklist-bar" style="width: 0%; height: 100%; background: #1b94ea; transition: 0.4s ease;"></div>
+                </div>
+
+               <div class="checklist-container">
+    <label class="check-item"><input type="checkbox" onclick="updateChecklistProgress()"> <span>Valid Passport & Visa</span></label>
+    <label class="check-item"><input type="checkbox" onclick="updateChecklistProgress()"> <span>Ticket saved as PDF</span></label>
+    
+    <label class="check-item"><input type="checkbox" onclick="updateChecklistProgress()"> <span>Check local weather & Pack accordingly</span></label>
+    <label class="check-item"><input type="checkbox" onclick="updateChecklistProgress()"> <span>Activate International Roaming or eSIM</span></label>
+    <label class="check-item"><input type="checkbox" onclick="updateChecklistProgress()"> <span>Notify Bank of travel (International use)</span></label>
+    <label class="check-item"><input type="checkbox" onclick="updateChecklistProgress()"> <span>Book Airport Transfer/Taxi</span></label>
+    <label class="check-item"><input type="checkbox" onclick="updateChecklistProgress()"> <span>Download Offline Google Maps</span></label>
+</div>
+
+               <button onclick="copyTripNotes()" id="btn-copy" style="margin-top: 20px; width: 100%; background: #6366f1; color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s;">
+    <span id="copy-icon">📋</span> <span id="copy-text">Copy My Trip Summary</span>
+</button>
+            </section>
+        </div>
+    </div>
+</div>
+<!-- FIN PAIMENT DE HAJAR -->
+<!-------------------------------------------------------------------------------------------------->
+  <!--OMAIMA-->
+     
+    <section class="testimonials">
+  <h2>What Our <span>Travelers Say</span></h2>
+
+  <div class="testimonial-grid">
+
+    <div class="testimonial-card">
+      <p class="testimonial-text">
+        The trip to Paris was absolutely magical ✨ Everything was perfectly organized,
+        from the hotel to the guided tours. I’ll definitely travel with OHA again!
+      </p>
+      <div class="testimonial-user">
+        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+        <div>
+          <h4>Sara El Amrani</h4>
+          <span>Paris Trip</span>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <p class="testimonial-text">
+        Marrakech was an unforgettable experience 🌴 The riad, the food, the vibes…
+        Everything exceeded my expectations. Highly recommended!
+      </p>
+      <div class="testimonial-user">
+        <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+        <div>
+          <h4>Youssef Benali</h4>
+          <span>Marrakech Trip</span>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <p class="testimonial-text">
+        Bali was a dream come true 🌊 The agency handled everything smoothly.
+        Zero stress, just pure enjoyment. Best travel decision ever.
+      </p>
+      <div class="testimonial-user">
+        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
+        <div>
+          <h4>Lina K.</h4>
+          <span>Bali Trip</span>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card">
+      <p class="testimonial-text">
+        New York was insane 🗽 Flights, hotel, activities — everything was on point.
+        Professional team and excellent customer service.
+      </p>
+      <div class="testimonial-user">
+        <img src="https://randomuser.me/api/portraits/men/75.jpg" alt="User">
+        <div>
+          <h4>Adam Johnson</h4>
+          <span>New York Trip</span>
+          <div class="stars">★★★★★</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<a href="memories.html" class="memories-btn">
+  📸 Our Memories
+</a>
+
+<section class="timeline-cta">
+  <h2>✨ Your Journey Awaits!</h2>
+  <p>See your personalized travel timeline and relive every magical moment with us.</p>
+  <a href="timeline.html" class="cta-btn">View My Travel Timeline</a>
+</section>
+
+<footer class="quiz-footer">
+  <div class="quiz-footer-content">
+    <h3>✨ Not sure where to go next?</h3>
+    <p>
+      Discover your <strong>travel type</strong> and get personalized
+      destination suggestions made just for you.
+    </p>
+    <a href="personality-test.html" class="quiz-btn">
+      Take the Travel Test 🧭
+    </a>
+  </div>
+</footer>
+
+<!---------------------------------------------------------------------------------------------->
+
+  <script>
+    // ===== Contact overlay =====
+    const contactBtn = document.getElementById("contact-btn");
+    const contactOverlay = document.getElementById("contact-overlay");
+    const closeButton = document.getElementById("contact-close");
+
+    contactBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      contactOverlay.classList.add("show");
+    });
+    closeButton.addEventListener("click", () => contactOverlay.classList.remove("show"));
+    contactOverlay.addEventListener("click", (e) => {
+      if (!e.target.closest(".contact-modal")) contactOverlay.classList.remove("show");
+    });
+
+    const sendBtn = document.getElementById("send-message");
+    const textarea = document.getElementById("msg");
+    const successMsg = document.getElementById("contact-success");
+
+    sendBtn.addEventListener("click", () => {
+      const message = textarea.value.trim();
+      if (!message) { alert("Please write a message before sending."); return; }
+      successMsg.style.display = "block";
+      textarea.value = "";
+      setTimeout(() => {
+        successMsg.style.display = "none";
+        contactOverlay.classList.remove("show");
+      }, 2000);
+    });
+
+    // ===== Search suggestions =====
+    const destinations = ["Paris","Parme","Paramaribo","Pardubice","Panama City","Palo Alto","Papeete","Palermo","Palma de Majorque","Prague","Porto","Paris, France","Paraná, Brésil","London","Lisbon","Madrid","Marrakech","Casablanca","Rabat","New York","Maroc","Santorini","Dubai"];
+    const input = document.getElementById("search-input");
+    const suggestionsBox = document.getElementById("suggestions");
+
+    input.addEventListener("input", function () {
+      const query = this.value.trim().toLowerCase();
+      if (!query) { suggestionsBox.innerHTML=""; suggestionsBox.style.display="none"; return; }
+
+      const filtered = destinations.filter(item => item.toLowerCase().startsWith(query));
+      if (!filtered.length) { suggestionsBox.innerHTML=""; suggestionsBox.style.display="none"; return; }
+
+      suggestionsBox.innerHTML = filtered.slice(0,8).map(item => `<div class="suggestion-item">${item}</div>`).join("");
+      suggestionsBox.style.display = "block";
+    });
+
+    suggestionsBox.addEventListener("click", (e) => {
+      if (e.target.classList.contains("suggestion-item")) {
+        input.value = e.target.textContent;
+        suggestionsBox.innerHTML = "";
+        suggestionsBox.style.display = "none";
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".search-wrapper")) {
+        suggestionsBox.innerHTML = "";
+        suggestionsBox.style.display = "none";
+      }
+    });
+
+    // ===== Wizard logic =====
+    const cards = document.querySelectorAll(".polaroid");
+    const overlay = document.getElementById("overlay");
+
+    const panes = {
+      1: document.getElementById("pane1"),
+      2: document.getElementById("pane2"),
+      3: document.getElementById("pane3"),
+      4: document.getElementById("pane4"),
+    };
+
+    const steps = Array.from(document.querySelectorAll(".stepper .step"));
+    const bannerInfo = document.getElementById("bannerInfo");
+
+    const dImg = document.getElementById("dImg");
+    const dTitle = document.getElementById("dTitle");
+    const dDates = document.getElementById("dDates");
+    const dOld = document.getElementById("dOld");
+    const dNew = document.getElementById("dNew");
+    const dDesc = document.getElementById("dDesc");
+    const dRating = document.getElementById("dRating");
+    const dDuration = document.getElementById("dDuration");
+    const dIncluded = document.getElementById("dIncluded");
+    const dLeft = document.getElementById("dLeft");
+
+    document.getElementById("closeAll").onclick = closeAll;
+    document.getElementById("btnClose1").onclick = closeAll;
+    document.getElementById("btnCloseDone").onclick = closeAll;
+
+    document.getElementById("btnToPay").addEventListener("click", () => goStep(2));
+    document.getElementById("btnBackToDetails").addEventListener("click", () => goStep(1));
+    document.getElementById("btnEdit").addEventListener("click", () => goStep(2));
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay.style.display === "flex") closeAll();
+    });
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeAll();
+    });
+
+    const state = {
+      destination: { title:"", img:"", old:0, price:0, dates:"", desc:"", rating:"—", duration:"—", included:"—", left:"—" },
+      customer: { name:"", email:"", phone:"" },
+      payment: { travelClass:"", method:"", number:"", passengers:1, insurance:true },
+      pricing: { base:0, classExtra:0, insurance:0, taxes:0, total:0 }
+    };
+
+    function openOverlay(){
+      overlay.style.display = "flex";
+      document.body.classList.add("blur");
+    }
+    function closeAll(){
+      overlay.style.display = "none";
+      document.body.classList.remove("blur");
+      goStep(1, true);
+    }
+
+    function goStep(n, silent=false){
+      Object.values(panes).forEach(p => p.hidden = true);
+      panes[n].hidden = false;
+
+      steps.forEach(s => {
+        const k = Number(s.dataset.step);
+        s.classList.remove("active","done");
+        if (k < n) s.classList.add("done");
+        if (k === n) s.classList.add("active");
+      });
+
+      if (!silent){
+        bannerInfo.textContent =
+          `Destination: ${state.destination.title || "—"} | From: ${formatEUR(state.destination.price)} | Dates: ${state.destination.dates || "—"}`;
+      }
+
+      if (n === 2) updatePriceBox();
+      if (n === 3) renderConfirm();
+    }
+
+    function formatEUR(x){
+      const num = Number(x) || 0;
+      return `${num.toFixed(0)}€`;
+    }
+
+    function maskNumber(str){
+      const clean = (str || "").replace(/\s+/g,"");
+      if (clean.length <= 6) return str || "—";
+      return clean.slice(0,3) + "••••••" + clean.slice(-3);
+    }
+
+    cards.forEach(card => {
+      card.addEventListener("click", () => {
+        state.destination.title = card.dataset.title || "";
+        state.destination.img = card.dataset.img || "";
+        state.destination.old = Number(card.dataset.old || 0);
+        state.destination.price = Number(card.dataset.new || 0);
+        state.destination.dates = card.dataset.dates || "";
+        state.destination.desc = card.dataset.desc || "";
+        state.destination.rating = card.dataset.rating || "—";
+        state.destination.duration = card.dataset.duration || "—";
+        state.destination.included = card.dataset.included || "—";
+        state.destination.left = card.dataset.left || "—";
+
+        dImg.src = state.destination.img;
+        dTitle.textContent = state.destination.title;
+        dDates.textContent = state.destination.dates;
+        dOld.textContent = formatEUR(state.destination.old);
+        dNew.textContent = formatEUR(state.destination.price);
+        dDesc.textContent = state.destination.desc;
+        dRating.textContent = state.destination.rating;
+        dDuration.textContent = state.destination.duration;
+        dIncluded.textContent = `✅ Included: ${state.destination.included}`;
+        dLeft.textContent = `🎟️ Seats left: ${state.destination.left}`;
+
+        openOverlay();
+        goStep(1);
+      });
+    });
+
+    const methodBtns = Array.from(document.querySelectorAll(".method"));
+    methodBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        methodBtns.forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.payment.method = btn.dataset.method;
+        setErr("eMethod","");
+      });
+    });
+
+    const pClass = document.getElementById("pClass");
+    const pPassengers = document.getElementById("pPassengers");
+    const pInsurance = document.getElementById("pInsurance");
+
+    [pClass, pPassengers, pInsurance].forEach(el => {
+      el.addEventListener("input", () => {
+        state.payment.travelClass = pClass.value;
+        state.payment.passengers = Number(pPassengers.value || 1);
+        state.payment.insurance = pInsurance.checked;
+        updatePriceBox();
+      });
+    });
+
+    function setErr(id,msg){
+      document.getElementById(id).textContent = msg || "";
+    }
+
+    function validatePay(){
+      let ok = true;
+
+      const name = document.getElementById("pName").value.trim();
+      const email = document.getElementById("pEmail").value.trim();
+      const phone = document.getElementById("pPhone").value.trim();
+      const travelClass = document.getElementById("pClass").value;
+      const number = document.getElementById("pNumber").value.trim();
+      const passengers = Number(document.getElementById("pPassengers").value || 0);
+
+      ["eName","eEmail","ePhone","eClass","eMethod","eNumber","ePassengers"].forEach(x => setErr(x,""));
+
+      if (name.length < 3){ setErr("eName","Name too short."); ok = false; }
+      if (!/^\S+@\S+\.\S+$/.test(email)){ setErr("eEmail","Invalid email."); ok = false; }
+      if (!/^\+?\d[\d\s]{8,}$/.test(phone)){ setErr("ePhone","Invalid phone."); ok = false; }
+      if (!travelClass){ setErr("eClass","Choose a class."); ok = false; }
+      if (!state.payment.method){ setErr("eMethod","Choose a method."); ok = false; }
+
+      const clean = number.replace(/\s+/g,"");
+      if (clean.length < 8){ setErr("eNumber","Invalid card/RIB number."); ok = false; }
+      if (!passengers || passengers < 1){ setErr("ePassengers","Passengers >= 1"); ok = false; }
+
+      if (!ok) return false;
+
+      state.customer = { name, email, phone };
+      state.payment.travelClass = travelClass;
+      state.payment.number = number;
+      state.payment.passengers = passengers;
+      state.payment.insurance = document.getElementById("pInsurance").checked;
+      return true;
+    }
+
+    function computePricing(){
+      const base = state.destination.price * (state.payment.passengers || 1);
+      let pct = 0;
+      if (state.payment.travelClass === "Business") pct = 0.15;
+      if (state.payment.travelClass === "First Class") pct = 0.30;
+
+      const classExtra = Math.round(base * pct);
+      const insurance = state.payment.insurance ? 20 * (state.payment.passengers || 1) : 0;
+      const taxes = Math.round((base + classExtra) * 0.05);
+
+      const total = base + classExtra + insurance + taxes;
+      state.pricing = { base, classExtra, insurance, taxes, total };
+    }
+
+    function updatePriceBox(){
+      computePricing();
+      const b = state.pricing;
+
+      document.getElementById("priceBox").innerHTML = `
+        <div class="row"><span>🎫 Ticket (${state.payment.passengers || 1} pax)</span><span><b>${formatEUR(b.base)}</b></span></div>
+        <div class="row"><span>✨ Class upgrade</span><span><b>${formatEUR(b.classExtra)}</b></span></div>
+        <div class="row"><span>🛡 Insurance</span><span><b>${formatEUR(b.insurance)}</b></span></div>
+        <div class="row"><span>🧾 Taxes (5%)</span><span><b>${formatEUR(b.taxes)}</b></span></div>
+        <div class="row total"><span>Total</span><span><b>${formatEUR(b.total)}</b></span></div>
+      `;
+    }
+
+    document.getElementById("payForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!validatePay()) return;
+      goStep(3);
+    });
+
+    function renderConfirm(){
+      computePricing();
+      const d = state.destination;
+      const c = state.customer;
+      const p = state.payment;
+      const b = state.pricing;
+
+      document.getElementById("confirmBox").innerHTML = `
+        <div class="row"><span>📍 Destination</span><span><b>${d.title}</b></span></div>
+        <div class="row"><span>📅 Dates</span><span><b>${d.dates}</b></span></div>
+        <div class="row"><span>💰 Price</span><span><b>${formatEUR(d.price)}</b> <span style="color:#9aa0a6;text-decoration:line-through;margin-left:8px;">${formatEUR(d.old)}</span></span></div>
+        <hr style="border:none;border-top:1px solid rgba(0,0,0,0.08);margin:10px 0;">
+        <div class="row"><span>👤 Name</span><span><b>${c.name}</b></span></div>
+        <div class="row"><span>📧 Email</span><span><b>${c.email}</b></span></div>
+        <div class="row"><span>📞 Phone</span><span><b>${c.phone}</b></span></div>
+        <div class="row"><span>🎟 Class</span><span><b>${p.travelClass}</b></span></div>
+        <div class="row"><span>🔒 Method</span><span><b>${p.method}</b></span></div>
+        <div class="row"><span>🧾 Number</span><span><b>${maskNumber(p.number)}</b></span></div>
+        <hr style="border:none;border-top:1px solid rgba(0,0,0,0.08);margin:10px 0;">
+        <div class="row"><span>Total</span><span><b>${formatEUR(b.total)}</b></span></div>
+      `;
+    }
+
+    document.getElementById("btnContinue").addEventListener("click", () => {
+      const btn = document.getElementById("btnContinue");
+      btn.disabled = true;
+      btn.textContent = "Processing...";
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btn.textContent = "Confirm & Pay ✅";
+      renderNiceTicket(state.destination, state.customer, state.pricing);
+      renderSuggestions();
+      goStep(4);
+
+      }, 900);
+    });  
+
+
+
+
+
+    function makeId(){
+  return "#" + Math.random().toString(16).slice(2,8).toUpperCase();
+}
+
+function destToCode(title){
+  const clean = (title || "").replace(/[^a-zA-Z]/g,"");
+  return (clean.slice(0,3).toUpperCase() || "TRP");
+}
+
+// QR visuel réaliste (pas un damier)
+function drawFakeQR(canvas, text){
+  const ctx = canvas.getContext("2d");
+  const size = 170;
+  canvas.width = size;
+  canvas.height = size;
+
+  // fond
+  ctx.fillStyle = "#fff";
+  ctx.fillRect(0,0,size,size);
+
+  // style
+  const cell = 5;                 // taille de "pixel"
+  const cols = Math.floor(size / cell);
+
+  // hash simple basé sur le texte (stable)
+  let h = 2166136261;
+  for (let i=0;i<text.length;i++){
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+
+  function rand(){
+    h = (h ^ (h << 13)) >>> 0;
+    h = (h ^ (h >> 17)) >>> 0;
+    h = (h ^ (h << 5)) >>> 0;
+    return h / 4294967295;
+  }
+
+  // “finder patterns” (3 carrés) comme un vrai QR
+  function finder(x,y){
+    ctx.fillStyle="#000";
+    ctx.fillRect(x,y,7*cell,7*cell);
+    ctx.fillStyle="#fff";
+    ctx.fillRect(x+cell,y+cell,5*cell,5*cell);
+    ctx.fillStyle="#000";
+    ctx.fillRect(x+2*cell,y+2*cell,3*cell,3*cell);
+  }
+
+  finder(2*cell, 2*cell);
+  finder((cols-9)*cell, 2*cell);
+  finder(2*cell, (cols-9)*cell);
+
+  // zone data
+  for (let r=0;r<cols;r++){
+    for (let c=0;c<cols;c++){
+      // évite zones finder
+      const inTL = (c>=2 && c<9 && r>=2 && r<9);
+      const inTR = (c>=cols-9 && c<cols-2 && r>=2 && r<9);
+      const inBL = (c>=2 && c<9 && r>=cols-9 && r<cols-2);
+      if (inTL || inTR || inBL) continue;
+
+      // densité + motif stable
+      const v = rand();
+      if (v > 0.62){
+        ctx.fillStyle="#000";
+        ctx.fillRect(c*cell, r*cell, cell, cell);
+      }
+    }
+  }
+
+  // bord arrondi léger (illusion)
+  ctx.strokeStyle="rgba(0,0,0,0.08)";
+  ctx.lineWidth=2;
+  ctx.strokeRect(1,1,size-2,size-2);
+}
+
+function renderNiceTicket(d, c, b){
+  const ticketId = makeId();
+  const today = new Date().toLocaleDateString("fr-FR");
+  const destCode = destToCode(d.title);
+
+  document.getElementById("ticketBox").innerHTML = `
+    ${document.querySelector(".bp") ? "" : ""}
+
+    <div class="bp">
+      <div class="bp-left">
+        <div class="bp-header">
+          <div class="bp-brand">
+            <div class="bp-logo">✈️</div>
+            <div>
+              <div class="bp-title">OHA TRAVEL</div>
+              <div class="bp-sub">Boarding Pass • <span id="bpDate">${today}</span></div>
+            </div>
+          </div>
+          <div class="bp-status">CONFIRMED</div>
+        </div>
+
+        <div class="bp-route">
+          <div class="bp-air">
+            <div class="bp-code">CMN</div>
+            <div class="bp-city">Casablanca</div>
+          </div>
+
+          <div class="bp-mid">
+            <div class="bp-line"></div>
+            <div class="bp-plane">✈</div>
+            <div class="bp-line"></div>
+          </div>
+
+          <div class="bp-air">
+            <div class="bp-code" id="bpDestCode">${destCode}</div>
+            <div class="bp-city" id="bpDestCity">${d.title || "Destination"}</div>
+          </div>
+        </div>
+
+        <div class="bp-message">
+          <div class="bp-msg-title">🌍 Bon voyage, ${c.name || "voyageur"} !</div>
+          <div class="bp-msg-text">
+            May your trip be filled with beautiful memories, pleasant surprises,
+            and incredible photos (even backlit ones).
+          </div>
+        </div>
+
+        <div class="bp-grid">
+          <div class="bp-item">
+            <div class="k">Passager</div>
+            <div class="v" id="bpName">${c.name || "—"}</div>
+          </div>
+          <div class="bp-item">
+            <div class="k">Ticket</div>
+            <div class="v" id="bpId">${ticketId}</div>
+          </div>
+          <div class="bp-item">
+            <div class="k">Dates</div>
+            <div class="v" id="bpDates">${d.dates || "—"}</div>
+          </div>
+          <div class="bp-item">
+            <div class="k">Payé</div>
+            <div class="v" id="bpPaid">${(Number(b.total)||0).toFixed(0)}€</div>
+          </div>
+        </div>
+
+        <div class="bp-help">
+          💙 Need help? Contact us, we respond quickly (we don’t judge last-minute changes).
+        </div>
+      </div>
+
+      <div class="bp-right">
+        <div class="bp-qrCard">
+          <div class="bp-qrTop">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="bp-qrTxt">SCAN</span>
+          </div>
+
+          <canvas id="qrCanvas" width="170" height="170"></canvas>
+
+          <div class="bp-qrFoot">Boarding Gate • Show at check-in</div>
+        </div>
+
+        <div class="bp-mini">
+          <div class="k">Included</div>
+          <div class="v" id="bpInc">${d.included || "—"}</div>
+        </div>
+        <div class="bp-mini">
+          <div class="k">Seats left</div>
+          <div class="v" id="bpLeft">${d.left || "—"}</div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // QR réaliste (visuel)
+  drawFakeQR(document.getElementById("qrCanvas"), `${ticketId}|${d.title}|${d.dates}|${c.name}|${b.total}`);
+}
+
+
+    function renderSuggestions(){
+      const grid = document.getElementById("suggestGrid");
+      grid.innerHTML = "";
+
+      const all = Array.from(cards).filter(c =>
+        (c.dataset.title || "").toLowerCase() !== (state.destination.title || "").toLowerCase()
+      );
+
+      all.slice(0,4).forEach(card => {
+        const div = document.createElement("div");
+        div.className = "suggest-card";
+        div.innerHTML = `
+          <img src="${card.dataset.img || ""}" alt="">
+          <p>${card.dataset.title || "Destination"}</p>
+        `;
+
+        div.addEventListener("click", () => {
+          state.destination.title = card.dataset.title || "";
+          state.destination.img = card.dataset.img || "";
+          state.destination.old = Number(card.dataset.old || 0);
+          state.destination.price = Number(card.dataset.new || 0);
+          state.destination.dates = card.dataset.dates || "";
+          state.destination.desc = card.dataset.desc || "";
+          state.destination.rating = card.dataset.rating || "—";
+          state.destination.duration = card.dataset.duration || "—";
+          state.destination.included = card.dataset.included || "—";
+          state.destination.left = card.dataset.left || "—";
+
+          dImg.src = state.destination.img;
+          dTitle.textContent = state.destination.title;
+          dDates.textContent = state.destination.dates;
+          dOld.textContent = formatEUR(state.destination.old);
+          dNew.textContent = formatEUR(state.destination.price);
+          dDesc.textContent = state.destination.desc;
+          dRating.textContent = state.destination.rating;
+          dDuration.textContent = state.destination.duration;
+          dIncluded.textContent = `✅ Included: ${state.destination.included}`;
+          dLeft.textContent = `🎟️ Seats left: ${state.destination.left}`;
+
+          goStep(1);
+        });
+
+        grid.appendChild(div);
+      });
+    }
+
+    /*------------------------H A J A R ----------------------------------------------*/
+    // HAJAR
+
+ // Gestion du modal pour Login/Sign In
+    const signinLink = document.getElementById("signin-link")
+    const loginLink = document.getElementById("login-link")
+    const modal = document.getElementById("login-modal")
+    const closeModal = document.getElementById("close-modal")
+    const loginForm = document.getElementById("login-form")
+
+    // Ouvrir le modal
+    signinLink.addEventListener("click", function (e) {
+      e.preventDefault()
+      modal.style.display = "flex"
+    })
+
+    loginLink.addEventListener("click", function (e) {
+      e.preventDefault()
+      modal.style.display = "flex"
+    })
+
+    // Fermer le modal
+    closeModal.addEventListener("click", function () {
+      modal.style.display = "none"
+    })
+
+    // Fermer en cliquant sur l'overlay
+    modal.addEventListener("click", function (e) {
+      if (e.target === modal) {
+        modal.style.display = "none"
+      }
+    })
+
+    // Soumission du formulaire (pour l'exemple, juste un alert)
+    loginForm.addEventListener("submit", function (e) {
+      e.preventDefault()
+      alert("Login submitted!")
+      modal.style.display = "none"
+    })
+    function handleGoogleLogin() {
+    const btn = document.querySelector('.btn-google');
+    const originalContent = btn.innerHTML;
+    
+    // 1. Changer l'apparence pour simuler un chargement
+    btn.style.opacity = "0.7";
+    btn.innerHTML = "Connecting...";
+    btn.disabled = true;
+
+    // 2. Simuler une attente de 1.5 secondes
+    setTimeout(() => {
+        console.log("Google Login Clicked");
+        alert("Redirecting to Google Authentication...");
+        
+        // Réinitialisation
+        btn.style.opacity = "1";
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+    }, 1500);
+}
+    // Gestion du drawer pour About Us
+    const aboutLink = document.getElementById("about-link")
+    const drawer = document.getElementById("about-drawer")
+    const closeDrawer = document.getElementById("close-drawer")
+    console.log("About link:", aboutLink) // Pour vérifier que l'élément est trouvé
+    // Ouvrir le drawer et le fermer automatiquement après 100 secondes
+    aboutLink.addEventListener("click", function (e) {
+      e.preventDefault()
+      console.log("About Us clicked") // Pour debug
+      drawer.classList.add("open")
+      setTimeout(() => {
+        drawer.classList.remove("open")
+        console.log("Drawer closed") // Pour debug
+      },100000) // 100 secondes
+    })
+    // Fermer manuellement si besoin
+    closeDrawer.addEventListener("click", function () {
+      drawer.classList.remove("open")
+    })
+/*hajar*/
+// 1. Vos données avec noms exacts
+const cityData = {
+  "Paris": [
+    { name: "Eiffel Tower", img: "Eiffel Tower.jpeg", price: "25€", hotels: "Pullman Paris" },
+    { name: "Louvre Museum", img: "Louvre Museum.jpeg", price: "17€", hotels: "Hôtel Regina" },
+    { name: "Arc de Triomphe", img: "Arc de Triomphe.jpeg", price: "13€", hotels: "Hôtel Splendid" },
+    { name: "Sacré-Cœur Basilica", img: "Sacré-Cœur Basilica.jpeg", price: "Gratuit", hotels: "Le Relais Montmartre" }
+  ],
+  "Marrakech": [
+    { name: "Majorelle Garden", img: "majorelle.jpeg", price: "15€", hotels: "La Mamounia" },
+    { name: "Jemaa el-Fnaa Square", img: "jamma.jpeg", price: "Gratuit", hotels: "Hôtel Post" },
+    { name: "Bahia Palace", img: "athing.jpeg", price: "7€", hotels: "Riad Kniza" },
+    { name: "Koutoubia Mosque", img: "koutoubia.jpeg", price: "Gratuit", hotels: "Hôtel Les Jardins" }
+  ]
+};
+
+// 2. Gestion du clic sur les suggestions et génération des cadres
+suggestionsBox.addEventListener("click", function (e) {
+  if (e.target.classList.contains("suggestion-item")) {
+    const cityName = e.target.textContent.trim();
+    input.value = cityName;
+    suggestionsBox.style.display = "none";
+
+    // --- AJOUT : Appeler le carrousel ici ---
+    const target = document.getElementById("target-results");
+    target.style.display = "block"; // On affiche le conteneur
+    loadCityCarousel(cityName); 
+    
+    // Scroll fluide vers les résultats
+    target.scrollIntoView({ behavior: "smooth" });
+  }
+});
+
+function showDetails(placeName, cityName) {
+  selectedPlaceName = placeName;
+    const place = cityData[cityName].find(p => p.name === placeName);
+    const overlay = document.getElementById('details-overlay');
+    const content = document.getElementById('modal-content-dynamic');
+
+    if (place) {
+        content.innerHTML = `
+            <img src="${place.img}" alt="${placeName}" style="width:100%; height:250px; object-fit:cover; border-radius: 20px 20px 0 0;">
+            <div class="details-body" style="padding: 20px;">
+                <h2 style="color:#1b94ea;">${placeName}</h2>
+                <p style="color:#666;"> ${place.hotels}</p>
+                
+                <p><strong>Choose Your Experience :</strong></p>
+                <div class="ticket-options">
+                    <button class="opt-btn vip-style" onclick="selectTicket('VIP', '${placeName}')">⭐ VIP</button>
+                    <button class="opt-btn norm-style" onclick="selectTicket('Normal', '${placeName}')">🎫 Normal</button>
+                </div>
+                
+                <div id="dynamic-details-area"></div>
+            </div>
+        `;
+        overlay.style.display = 'flex';
+        document.body.classList.add("blur");
+    }
+}
+// Variables globales pour le calcul
+let baseTicketPrice = 0;
+let currentCurrency = 'EUR';
+const rates = { 'EUR': 1, 'USD': 1.1, 'GBP': 0.85 };
+
+function selectTicket(type, placeName) {
+    const detailArea = document.getElementById('dynamic-details-area');
+    const modalImg = document.querySelector('#modal-content-dynamic img');
+    
+    // Réduction de l'image
+    modalImg.style.height = '110px';
+    modalImg.style.transition = '0.4s';
+
+    baseTicketPrice = type === 'VIP' ? 45 : 15;
+    let duration = type === 'VIP' ? "3h (Guided)" : "1.5h (Standard)";
+
+    detailArea.style.display = 'block';
+    detailArea.innerHTML = `
+        <div class="flex-box">
+            <div class="flex-row">
+                <div class="flex-item">
+                    <label>Select Date</label>
+                    <input type="date" id="visit-date" class="flex-input" min="${new Date().toISOString().split('T')[0]}" onchange="updateFullTotal()">
+                </div>
+                <div class="flex-item">
+                    <label>Time Slot</label>
+                    <select id="visit-time" class="flex-input">
+                        <option value="09:00">Morning (09:00)</option>
+                        <option value="14:00">Afternoon (14:00)</option>
+                        <option value="18:00">Evening (18:00)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="flex-row">
+                <div class="flex-item">
+                    <label>Travelers</label>
+                    <input type="number" id="nb-travelers" class="flex-input" value="1" min="1" max="10" onchange="updateFullTotal()">
+                </div>
+                <div class="flex-item">
+                    <label>Currency</label>
+                    <select id="currency-select" class="flex-input" onchange="changeCurrency(this.value)">
+                        <option value="EUR">EUR (€)</option>
+                        <option value="USD">USD ($)</option>
+                        <option value="GBP">GBP (£)</option>
+                    </select>
+                </div>
+            </div>
+
+            <label class="option-check">
+                <input type="checkbox" id="cancel-insurance" onchange="updateFullTotal()"> 
+                <div>
+                    <span style="font-size: 0.85rem; font-weight:bold; color:#27ae60;">🛡️ Free Cancellation</span><br>
+                    <span style="font-size: 0.7rem; color:#666;">Full refund up to 24h before (+5€/pers.)</span>
+                </div>
+            </label>
+        </div>
+
+        <div class="total-zone">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <span style="font-size: 0.8rem; color:#777;">Total to pay</span><br>
+                    <strong id="final-price-display" style="font-size: 1.4rem; color:#1b94ea;">0.00€</strong>
+                </div>
+                <div style="text-align:right;">
+                    <span style="font-size: 0.8rem; color:#777;">Duration</span><br>
+                    <span style="font-size: 0.9rem; font-weight:bold;">⏳ ${duration}</span>
+                </div>
+            </div>
+            <button class="buy-btn" style="width: 100%; margin-top:15px; padding:15px; border-radius:10px; font-weight:bold;" onclick="startCheckout()">
+                Confirm & Book Now 
+            </button>
+        </div>
+    `;
+    updateFullTotal(); // Premier calcul
+}
+
+function changeCurrency(val) {
+    currentCurrency = val;
+    updateFullTotal();
+}
+
+function updateFullTotal() {
+    const nb = parseInt(document.getElementById('nb-travelers').value) || 1;
+    const insurance = document.getElementById('cancel-insurance').checked;
+    
+    // Calcul
+    let pricePerPers = baseTicketPrice + (insurance ? 5 : 0);
+    let totalInEur = pricePerPers * nb;
+    
+    // Conversion
+    let convertedTotal = totalInEur * rates[currentCurrency];
+    
+    // Symboles
+    const symbols = { 'EUR': '€', 'USD': '$', 'GBP': '£' };
+    const sym = symbols[currentCurrency];
+
+    document.getElementById('final-price-display').innerText = 
+        currentCurrency === 'USD' ? `${sym}${convertedTotal.toFixed(2)}` : `${convertedTotal.toFixed(2)}${sym}`;
+}
+function selectCard(element, type) {
+    // 1. On cherche toutes les cartes et on leur enlève la classe 'selected'
+    const allCards = document.querySelectorAll('.card-type');
+    allCards.forEach(card => card.classList.remove('selected'));
+
+    // 2. On ajoute la classe 'selected' uniquement sur la carte cliquée
+    element.classList.add('selected');
+
+    // 3. On enregistre le choix pour le résumé final
+    selectedPaymentMethod = type;
+}
+// Fonction pour mettre à jour le prix si l'assurance est cochée
+function updateTotalPrice(basePrice) {
+    const insurance = document.getElementById('cancel-insurance').checked;
+    const total = insurance ? basePrice + 5 : basePrice;
+    document.getElementById('final-price-display').innerText = `Total: ${total}€`;
+}
+
+// 4. Fonction pour fermer
+
+// --- FONCTIONS POUR LE FORMULAIRE DE PAIEMENT ---
+
+// Étape 1 : Ouvrir le formulaire et fermer les détails
+function startCheckout() {
+    document.getElementById('details-overlay').style.display = 'none';
+    document.getElementById('checkout-overlay').style.display = 'flex';
+}
+
+// Étape 2 : Afficher le récapitulatif pour vérification
+function showReview() {
+    const name = document.getElementById('cust-name').value;
+    const email = document.getElementById('cust-email').value;
+    const phone = document.getElementById('cust-phone').value;
+
+    // Vérification simple si les champs sont vides
+    if (!name || !email || !phone) {
+        alert("Please fill in all fields before continuing.");
+        return;
+    }
+
+    // Remplir la zone de résumé
+    const summary = document.getElementById('summary-zone');
+    summary.innerHTML = `
+        <p style="margin:5px 0;"><strong>👤 Name :</strong> ${name}</p>
+        <p style="margin:5px 0;"><strong>📧 Email :</strong> ${email}</p>
+        <p style="margin:5px 0;"><strong>📞 Phone :</strong> ${phone}</p>
+    `;
+
+    // Basculer l'affichage vers le récapitulatif
+    document.getElementById('checkout-step-1').style.display = 'none';
+    document.getElementById('checkout-step-2').style.display = 'block';
+}
+
+// Revenir en arrière pour modifier
+function backToEdit() {
+    document.getElementById('checkout-step-1').style.display = 'block';
+    document.getElementById('checkout-step-2').style.display = 'none';
+}
+
+// Fermer le checkout complet
+function closeCheckout() {
+    document.getElementById('checkout-overlay').style.display = 'none';
+    document.body.classList.remove("blur");
+    
+    // Remettre à zéro pour la prochaine ouverture
+    setTimeout(backToEdit, 300); 
+}
+// Affiche le récapitulatif avec le RIB
+function showReview() {
+    const name = document.getElementById('cust-name').value;
+    const date = document.getElementById('visit-date').value;
+    const time = document.getElementById('visit-time').value;
+    const travelers = document.getElementById('nb-travelers').value;
+    const insurance = document.getElementById('cancel-insurance').checked ? "✅ Included" : "❌ Not taken";
+    const finalPrice = document.getElementById('final-price-display').innerText;
+
+   if (!date) {
+        alert("Please select a date!"); return;
+    }
+
+    const summary = document.getElementById('summary-zone');
+    summary.innerHTML = `
+        <div style="background:#f0f7ff; padding:15px; border-radius:10px; border-left:5px solid #1b94ea;">
+            <h4 style="margin-top:0;">Trip Summary</h4>
+            <p><strong>Traveler:</strong> ${name}</p>
+            <p><strong>Date & Time:</strong> ${date} at ${time}</p>
+            <p><strong>Group Size:</strong> ${travelers} Person(s)</p>
+            <p><strong>Protection:</strong> ${insurance}</p>
+            <hr>
+            <p style="font-size:1.2rem; margin-bottom:0;"><strong>Final Amount: ${finalPrice}</strong></p>
+        </div>
+    `;
+    
+    document.getElementById('checkout-step-1').style.display = 'none';
+    document.getElementById('checkout-step-2').style.display = 'block';
+}
+function processFinalPayment() {
+    const modalContent = document.getElementById('checkout-step-2');
+    
+    // 1. EFFET DE CHARGEMENT (Processing)
+    modalContent.innerHTML = `
+        <div style="text-align: center; padding: 50px 20px;">
+            <div class="loader" style="border: 6px solid #f3f3f3; border-top: 6px solid #1b94ea; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+            <h3 style="color: #555;">Processing your payment...</h3>
+            <p style="color: #999; font-size: 0.8rem;">Please do not close this window.</p>
+        </div>
+    `;
+
+    // Animation du loader (à mettre dans votre CSS ou via JS)
+    const style = document.createElement('style');
+    style.innerHTML = `@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`;
+    document.head.appendChild(style);
+
+    setTimeout(() => {
+        // 2. RECHERCHE DES DONNÉES
+        let currentCity = "";
+        for (let city in cityData) {
+            if (cityData[city].some(p => p.name === selectedPlaceName)) {
+                currentCity = city;
+                break;
+            }
+        }
+
+        const cityInfo = cityData[currentCity] || [];
+        const currentPlace = cityInfo.find(p => p.name === selectedPlaceName) || {};
+        const otherPlaces = cityInfo.filter(p => p.name !== selectedPlaceName);
+
+        // 3. AFFICHAGE DU SUCCÈS ET PROPOSITIONS
+       modalContent.innerHTML = `
+    <div style="text-align: center; padding: 15px;">
+        <div style="font-size: 40px;">🎉</div>
+        <h2 style="color: #1b94ea; margin: 5px 0;">Success!</h2>
+        <p style="font-size: 0.85rem; color: #666;">Tickets for <b>${selectedPlaceName}</b> sent to your email.</p>
+        
+        <hr style="border:0; border-top:1px solid #eee; margin:15px 0;">
+
+        <div style="margin-bottom: 20px; border: 1px solid #e0f2fe; background: #f0f9ff; padding: 12px; border-radius: 12px;">
+            <h4 style="margin: 0 0 10px 0; font-size: 0.85rem; color: #0369a1;">🧳 Your Trip Toolbox:</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button onclick="downloadTicket()" style="background: white; border: 1px solid #bae6fd; padding: 8px; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 1.2rem;">🎫</span>
+                    <strong style="font-size: 0.7rem; color: #0369a1;">Ticket</strong>
+                </button>
+                <button onclick="openTravelGuide('${currentCity}')" style="background: white; border: 1px solid #bbf7d0; padding: 8px; border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center;">
+                    <span style="font-size: 1.2rem;">📖</span>
+                    <strong style="font-size: 0.7rem; color: #15803d;">Guide</strong>
+                </button>
+            </div>
+        </div>
+        <div id="hotel-promo-box" style="background: #fff9f0; border: 1px dashed #e67e22; padding: 12px; border-radius: 12px; text-align: left; margin-bottom: 15px;">
+            <h4 style="margin: 0 0 8px 0; color: #e67e22; font-size: 0.8rem;">🏨 Stay nearby?</h4>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <div style="flex-grow:1;">
+                    <strong style="display: block; font-size: 0.8rem;">${currentPlace.hotels || 'Luxury Hotel'}</strong>
+                </div>
+                <button onclick="bookHotelAction('${currentPlace.hotels}')" style="background: #e67e22; color: white; border: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: 0.7rem; font-weight: bold;">
+                    Book
+                </button>
+            </div>
+        </div>
+
+        <h4 style="text-align: left; margin: 10px 0; font-size: 0.85rem;">✨ Also in ${currentCity}:</h4>
+        <div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px;">
+            ${otherPlaces.map(p => `
+                <div style="min-width: 90px; background: #fff; border: 1px solid #eee; border-radius: 10px; padding: 5px;">
+                    <img src="${p.img}" style="width: 100%; height: 50px; object-fit: cover; border-radius: 6px;">
+                    <p style="font-size: 0.65rem; font-weight: bold; margin: 4px 0;">${p.name}</p>
+                </div>
+            `).join('')}
+        </div>
+                </div>
+                <div style="text-align: right; margin-bottom: 15px;">
+    <button onclick="seeMoreDestinations()" style="background: none; border: none; color: #1b94ea; font-weight: bold; cursor: pointer; font-size: 0.85rem; text-decoration: underline;">
+        See more destinations →
+    </button>
+</div>
+                <button class="btn-close-home" onclick="closeAndReturnHome()">
+            Close & Return Home
+        </button>
+            </div>
+        `;
+        showSuccess();
+    }, 2500); // Temps du "Processing"
+}
+
+// 4. ACTION DU BOUTON BOOK HOTEL
+function bookHotelAction(hotelName) {
+    const hotelBox = document.getElementById('hotel-promo-box');
+    hotelBox.style.background = "#eafaf1";
+    hotelBox.style.borderColor = "#27ae60";
+    
+    hotelBox.innerHTML = `
+        <div style="text-align: center; color: #27ae60;">
+            <p style="margin: 0; font-weight: bold;">✅ Reservation request sent to ${hotelName}!</p>
+            <p style="margin: 5px 0 0 0; font-size: 0.8rem;">Use code <b>TRAVEL2025</b> for -10%.</p>
+        </div>
+    `;
+}
+
+let isPaused = false; // Variable pour suivre l'état du survol
+let currentIndex = 0;
+
+function loadCityCarousel(city) {
+    const track = document.getElementById('cityCarousel');
+     const data = {
+        "paris": [
+            { name: "Eiffel Tower", img: "Eiffel Tower.jpeg"},
+            { name: "Louvre Museum", img: "Louvre Museum.jpeg"},
+            { name: "Arc de Triomphe", img: "Arc de Triomphe.jpeg" },
+            { name: "Sacré-Cœur Basilica", img: "Sacré-Cœur Basilica.jpeg" }
+        ],
+        "marrakech": [
+            { name: "Majorelle Garden", img: "majorelle.jpeg" },
+            { name: "Jemaa el-Fnaa Square", img: "jamma.jpeg" },
+            { name: "Bahia Palace", img: "athing.jpeg" },
+            { name: "Koutoubia Mosque", img: "koutoubia.jpeg" }
+        ]
+    };
+
+    const places = data[city.toLowerCase()];
+    if (!places) return;
+
+    // Injection des cartes
+    track.innerHTML = places.slice(0, 4).map((place, i) => `
+    <div class="place-card-3d" data-pos="${i}">
+        <img src="${place.img}" alt="${place.name}" style="width:100%; height:180px; object-fit:cover; border-radius:15px;">
+        <h3 style="margin:15px 0;">${place.name}</h3>
+        
+        <button class="btn-details" 
+            onclick="showDetails('${place.name.replace(/'/g, "\\'")}', '${city}')"
+            style="position: relative; z-index: 1000; pointer-events: auto;">
+            See Details
+        </button>
+    </div>
+`).join('');
+
+    const cards = track.querySelectorAll('.place-card-3d');
+
+    // GESTION DU HOVER
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => { isPaused = true; });  // Arrête le défilement
+        card.addEventListener('mouseleave', () => { isPaused = false; }); // Reprend le défilement
+    });
+
+    // ANIMATION AUTOMATIQUE
+    if (window.carouselInterval) clearInterval(window.carouselInterval);
+
+    window.carouselInterval = setInterval(() => {
+        if (!isPaused) { // On n'exécute la rotation QUE si la souris n'est pas dessus
+            currentIndex = (currentIndex + 1) % 4;
+            
+            cards.forEach((card, i) => {
+                let newPos = (i - currentIndex + 4) % 4;
+                card.setAttribute('data-pos', newPos);
+            });
+        }
+    }, 3200); // 4 secondes par rotation
+}
+
+
+// Action finale modifiée
+/**
+ * 1. SYSTÈME DE VOTE (ÉTOILES)
+ * Permet de sélectionner une note avant de fermer
+ */
+/**
+ * 1. GESTION DU RATING (ÉTOILES)
+ * Cette fonction colore les étoiles en doré au clic.
+ */
+function setRating(n) {
+    console.log("Note sélectionnée : " + n + "/5");
+    
+    // On récupère toutes les étoiles par leur nouvelle classe
+    const stars = document.querySelectorAll('.star-item');
+    
+    stars.forEach((star, index) => {
+        // Si l'index de l'étoile est inférieur à la note, on l'allume
+        if (index < n) {
+            star.classList.add('selected');
+        } else {
+            star.classList.remove('selected');
+        }
+    });
+}
+// * 4. OUVERTURE DE LA MODALE (À APPELER APRÈS LE PAIEMENT)
+function showSuccess() {
+    const overlay = document.getElementById('success-overlay');
+    if (overlay) {
+        overlay.style.display = 'flex'; 
+        
+        // AJOUT : Force le focus sur la modale en haut de l'écran
+        window.scrollTo(0, 0); 
+        
+        if (typeof isPaused !== 'undefined') {
+            isPaused = true;
+        }
+    } else {
+        console.error("Erreur : L'élément 'success-overlay' est introuvable.");
+    }
+}
+/**
+ * 3. FERMETURE ET RETOUR ACCUEIL
+ * Gère la disparition de la modale, relance l'avion et affiche le score final.
+ */
+function closeAndReturnHome() {
+    // 1. On cache l'overlay de succès
+    const successOverlay = document.getElementById('success-overlay');
+    if (successOverlay) {
+        successOverlay.style.display = 'none';
+    }
+
+    // 2. IMPORTANT : On cache aussi l'overlay de paiement (le conteneur parent)
+    const checkoutOverlay = document.getElementById('checkout-overlay');
+    if (checkoutOverlay) {
+        checkoutOverlay.style.display = 'none';
+    }
+
+    // 3. Nettoyage visuel
+    document.body.classList.remove("blur");
+    
+    // 4. Relancer les animations
+    isPaused = false;
+
+    // 5. Notification de points
+    setTimeout(() => {
+        processRewards(150);
+    }, 300);
+
+    // 6. Retour en haut fluide
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/**
+ * 3. SYSTÈME DE NOTIFICATION (TOAST)
+ * Crée le petit badge bleu "+150 points" qui apparaît en bas.
+ */
+function processRewards(points) {
+    // Création de l'élément
+    const toast = document.createElement('div');
+    toast.className = 'points-toast'; 
+    toast.innerHTML = `🌟 <strong>+${points} points</strong> ajoutés !`;
+    document.body.appendChild(toast);
+
+    // Déclenchement de l'animation d'entrée
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 100);
+
+    // Suppression automatique après 3.5 secondes
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 500); // Temps de l'animation de sortie
+    }, 3500);
+}
+function seeMoreDestinations() {
+    // 1. Fermer toutes les modales
+    closeAndReturnHome();
+    
+    // 2. Faire défiler jusqu'à la section de recherche ou des destinations
+    // On cible votre section de résultats ou le haut de la page
+    const searchSection = document.getElementById('search-input');
+    if (searchSection) {
+        searchSection.scrollIntoView({ behavior: 'smooth' });
+        searchSection.focus(); // Met le focus sur la barre de recherche
+    }
+}
+function skipRating() {
+    // 1. On cache le modal de rating
+    const ratingOverlay = document.getElementById('success-overlay');
+    if (ratingOverlay) {
+        ratingOverlay.style.display = 'none';
+    }
+
+    // 2. On s'assure que l'overlay de paiement/suggestions est visible
+    // Si vous voulez forcer le retour aux suggestions :
+    const checkoutOverlay = document.getElementById('checkout-overlay');
+    if (checkoutOverlay) {
+        checkoutOverlay.style.display = 'flex';
+        // On s'assure qu'on est sur l'étape des suggestions (step 2 modifiée)
+        document.getElementById('checkout-step-1').style.display = 'none';
+        document.getElementById('checkout-step-2').style.display = 'block';
+    }
+}
+// OUVRIR LE TICKET
+function downloadTicket() {
+    // 1. Récupération des données
+    const nameVal = document.getElementById('cust-name')?.value || "GUEST";
+    const destVal = (typeof selectedPlaceName !== 'undefined') ? selectedPlaceName : "DESTINATION";
+    const dateVal = document.getElementById('checkin')?.value || "2025-12-20";
+
+    // 2. Mise à jour des textes du ticket
+    document.getElementById('t-name').innerText = nameVal.toUpperCase();
+    document.getElementById('t-dest').innerText = destVal.toUpperCase();
+
+    // 3. GÉNÉRATION DU QR CODE RÉEL
+    // Nous créons un texte qui sera encodé dans le QR (ex: "Passenger: CHAKIB | Dest: PARIS")
+    const qrText = encodeURIComponent(`Passenger: ${nameVal} | Destination: ${destVal} | Date: ${dateVal}`);
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${qrText}`;
+    
+    // On applique l'URL à l'image
+    const qrImage = document.getElementById('ticket-qr');
+    if (qrImage) {
+        qrImage.src = qrUrl;
+    }
+
+    // 4. Affichage du modal
+    document.getElementById('ticket-modal').style.display = 'flex';
+}
+
+// OUVRIR LE GUIDE
+function openTravelGuide(city) {
+    const data = {
+        "paris": {
+            title: "PARIS: THE CITY OF LIGHT",
+            ess: "CLOTHES: Bring a chic umbrella and comfortable walking shoes. LANGUAGE: Always start with a polite 'Bonjour' to unlock the best service.",
+            voir: "MUST SEE: The Louvre (book 2 weeks early), Eiffel Tower at sunset, and the secret 'Passages Couverts' for a vintage vibe.",
+            faim: "FOOD: A crispy butter croissant for breakfast and 'Confit de Canard' in a traditional bistro in Le Marais."
+        },
+        "marrakech": {
+            title: "MARRAKECH: THE RED CITY",
+            ess: "WEATHER: Intense sun! Hat and sunscreen are mandatory. WATER: Drink only bottled and sealed water.",
+            voir: "MUST SEE: Majorelle Garden (book online), Jemaa el-Fna Square at night, and the stunning Bahia Palace.",
+            faim: "FOOD: Try the 'Tanjia Marrakchia' and enjoy a fresh Mint Tea on a rooftop overlooking the Medina."
+        }
+    };
+
+    const info = data[city.toLowerCase()] || { 
+        title: "TRAVEL GUIDE", 
+        ess: "Pack your bags and get ready for an amazing adventure!", 
+        voir: "Explore the local streets and hidden gems.", 
+        faim: "Don't forget to try the local street food!" 
+    };
+
+    // Mise à jour des éléments HTML de la modale Guide
+    document.getElementById('g-title').innerText = info.title;
+    document.getElementById('g-essentiel').innerText = info.ess;
+    document.getElementById('g-voir').innerText = info.voir;
+    document.getElementById('g-faim').innerText = info.faim;
+    
+    // Affichage de la modale
+    document.getElementById('guide-modal').style.display = 'flex';
+}
+// FERMER LES MODALES
+function closeToolboxModal(id) {
+    document.getElementById(id).style.display = 'none';
+}
+function printTicket() {
+    // On cache les éléments inutiles pour l'impression (boutons, croix)
+    const closeBtn = document.querySelector('#ticket-modal .close-rating');
+    const saveBtn = document.querySelector('#ticket-modal button[onclick="printTicket()"]');
+    
+    if(closeBtn) closeBtn.style.visibility = 'hidden';
+    if(saveBtn) saveBtn.style.visibility = 'hidden';
+
+    // On lance l'impression
+    window.print();
+
+    // On réaffiche après
+    if(closeBtn) closeBtn.style.visibility = 'visible';
+    if(saveBtn) saveBtn.style.visibility = 'visible';
+}
+// Fonction pour mettre à jour la progression de la checklist
+function updateChecklistProgress() {
+    const checkboxes = document.querySelectorAll('.checklist-container input[type="checkbox"]');
+    const total = checkboxes.length;
+    let checkedCount = 0;
+
+    checkboxes.forEach(cb => {
+        if (cb.checked) checkedCount++;
+    });
+
+    const percent = Math.round((checkedCount / total) * 100);
+    const progressBar = document.getElementById('checklist-bar');
+    const progressText = document.getElementById('checklist-percent');
+
+    if (progressBar) progressBar.style.width = percent + '%';
+    if (progressText) progressText.innerText = percent + '% Completed';
+}
+
+// Fonction pour copier les notes du voyage
+function copyTripNotes() {
+    const dest = document.getElementById('t-dest').innerText;
+    const ess = document.getElementById('g-essentiel').innerText;
+    const voir = document.getElementById('g-voir').innerText;
+    
+    // Récupérer tous les items de la checklist
+    const items = document.querySelectorAll('.check-item');
+    let checklistText = "";
+
+    items.forEach(item => {
+        const checkbox = item.querySelector('input[type="checkbox"]');
+        const text = item.querySelector('span').innerText;
+        // Si coché ✅, sinon ⬜
+        const status = checkbox.checked ? "✅" : "⬜";
+        checklistText += `${status} ${text}\n`;
+    });
+
+    const fullText = `✈️ OHA TRAVEL - MY TRIP TO ${dest}\n\n` +
+                     `📍 ESSENTIALS:\n${ess}\n\n` +
+                     `✨ MUST SEE:\n${voir}\n\n` +
+                     `📝 MY CHECKLIST:\n${checklistText}\n` +
+                     `Organized by OHA Travel Agency`;
+
+    navigator.clipboard.writeText(fullText).then(() => {
+        const btn = document.getElementById('btn-copy');
+        const textBtn = document.getElementById('copy-text');
+        
+        const originalColor = btn.style.background;
+        btn.style.background = "#22c55e"; 
+        textBtn.innerText = "Summary & Checklist Copied!";
+
+        setTimeout(() => {
+            btn.style.background = originalColor;
+            textBtn.innerText = "Copy My Trip Summary";
+        }, 2000);
+    });
+}
+// 4. Fonction pour fermer
+function closeDetails() {
+    document.getElementById('details-overlay').style.display = 'none';
+    document.body.classList.remove("blur");
+}
+// fin hajar
+    /*----------------------------------------------------------------------------------------*/
+
+
+    /*O M A I M A*/
+  const bookingSelector = document.getElementById('booking-type');
+  
+  bookingSelector.addEventListener('change', function() {
+    if (this.value === 'car') {
+      // Redirects to your new car page
+      window.location.href = 'cars_demo.html';
+    }
+
+    if (this.value === 'hotel') {
+      // Redirects to your new hotel page
+      window.location.href = 'hotels.html';
+    }
+
+        if (this.value === 'guide') {
+      // Redirects to your new guide page
+      window.location.href = 'guide.html';
+    }
+
+  });
+
+  </script>
+
+</body>
+</html>

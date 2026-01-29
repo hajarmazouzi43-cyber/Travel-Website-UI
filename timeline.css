@@ -1,0 +1,59 @@
+body {
+  background: #fdf6ec;
+  font-family: system-ui;
+}
+
+.title {
+  text-align: center;
+  margin: 60px 0;
+}
+
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: auto;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  background: #f08a5d;
+  transform: translateX(-50%);
+  border-radius: 10px;
+}
+
+.event {
+  width: 50%;
+  padding: 20px;
+  position: relative;
+}
+
+.event.left {
+  left: 0;
+}
+
+.event.right {
+  left: 50%;
+}
+
+.year {
+  font-weight: bold;
+  color: #f08a5d;
+}
+
+.content {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+}
+
+.content img {
+  width: 100%;
+  border-radius: 12px;
+  margin-top: 10px;
+}

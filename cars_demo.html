@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Rental - OHA Travel</title>
+    <style>
+        :root {
+            --primary: #ff5722;
+            --dark: #1a1a1a;
+            --light: #f4f4f4;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--light); margin: 0; padding: 20px; color: var(--dark); }
+        
+        .header-area { text-align: center; margin-bottom: 40px; }
+        .back-home { text-decoration: none; color: var(--primary); font-weight: bold; display: inline-block; margin-bottom: 10px; }
+        
+        /* Filters */
+        .filter-container { margin-bottom: 30px; text-align: center; position: sticky; top: 10px; z-index: 100; }
+        .filter-btn { 
+            padding: 12px 25px; margin: 5px; cursor: pointer; 
+            border: 2px solid var(--primary); border-radius: 30px; 
+            background: white; color: var(--primary);
+            font-weight: bold; transition: 0.3s;
+        }
+        .filter-btn.active, .filter-btn:hover { background: var(--primary); color: white; }
+        
+        /* Grid Layout */
+        .car-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 25px; 
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Car Cards */
+        .car-card { 
+            background: white; border-radius: 20px; overflow: hidden; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+            transition: transform 0.3s ease;
+            display: flex; flex-direction: column;
+        }
+        .car-card:hover { transform: translateY(-10px); }
+        .car-card img { width: 100%; height: 200px; object-fit: cover; }
+        
+        .car-info { padding: 20px; text-align: center; }
+        .car-info h3 { margin: 10px 0; font-size: 1.4rem; }
+        .price { color: var(--primary); font-weight: bold; font-size: 1.3rem; margin: 10px 0; }
+        .tag { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; background: #eee; padding: 5px 12px; border-radius: 50px; font-weight: bold; }
+        
+        .rent-btn {
+            background: var(--dark); color: white; border: none;
+            padding: 12px; width: 100%; border-radius: 0 0 20px 20px;
+            cursor: pointer; font-weight: bold; transition: 0.3s;
+        }
+        .rent-btn:hover { background: var(--primary); }
+
+        /* Modal Background Overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Modal Window */
+        .modal-window {
+            background: white;
+            width: 90%;
+            max-width: 800px;
+            border-radius: 20px;
+            position: relative;
+            padding: 30px;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 30px; border: none; background: none; cursor: pointer;
+        }
+
+        .modal-flex { display: flex; gap: 30px; flex-wrap: wrap; }
+        .modal-image { flex: 1; min-width: 300px; }
+        .modal-image img { width: 100%; border-radius: 15px; }
+        .modal-info { flex: 1; min-width: 250px; }
+
+        .details-list { margin: 20px 0; font-size: 0.9rem; color: #555; }
+        .price-label { margin-bottom: 0; font-size: 0.9rem; color: #777; }
+
+        .confirm-btn {
+            background: #ff5722; color: white; border: none;
+            padding: 15px 30px; width: 100%; border-radius: 10px;
+            font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: 0.3s;
+        }
+        .confirm-btn:hover { background: #e64a19; }
+
+        /* Drawer Overlay */
+        .drawer-overlay {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            transition: 0.4s ease;
+        }
+
+        .drawer-overlay.open { right: 0; }
+
+        /* The Semi-Page Content */
+        .drawer-content {
+            position: absolute;
+            right: 0; top: 0;
+            width: 100%; max-width: 450px;
+            height: 100%;
+            background: white;
+            padding: 40px 30px;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        .close-drawer {
+            background: none; border: none; font-size: 35px; cursor: pointer; position: absolute; top: 10px; left: 10px;
+        }
+
+        .input-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+        .input-group label { font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; }
+        .input-group input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+
+        .date-row { display: flex; gap: 15px; }
+        .date-row .input-group { flex: 1; }
+
+        /* Payment Styles */
+        .payment-options { display: flex; gap: 10px; margin: 10px 0 20px 0; }
+        .pay-card {
+            flex: 1; border: 2px solid #eee; padding: 10px; border-radius: 10px;
+            cursor: pointer; text-align: center; transition: 0.3s;
+        }
+        .pay-card img { height: 25px; width: auto; }
+        .pay-card input { display: none; }
+        .pay-card:has(input:checked) { border-color: #ff5722; background: #fff4f1; }
+
+        .final-btn {
+            width: 100%; padding: 15px; background: #ff5722; color: white;
+            border: none; border-radius: 10px; font-weight: bold; cursor: pointer;
+            font-size: 1rem; margin-top: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #card-details-fields {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px dashed #ccc;
+        }
+
+        /* Success Message Styling */
+        .success-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 4000;
+            justify-content: center;
+            align-items: center;
+        }
+        .success-card {
+            background: white; padding: 40px; border-radius: 20px; text-align: center;
+            max-width: 400px; animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+        @keyframes popIn { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="header-area">
+        <a href="test.html" class="back-home">← Back to Homepage</a>
+        <h1>Find the Perfect Ride</h1>
+        <p>Premium selection for every budget</p>
+    </div>
+
+    <div class="filter-container">
+        <button class="filter-btn active" onclick="filterCars('all', event)">All Cars</button>
+        <button class="filter-btn" onclick="filterCars('economic', event)">Economic</button>
+        <button class="filter-btn" onclick="filterCars('sport', event)">Sport</button>
+        <button class="filter-btn" onclick="filterCars('vip', event)">VIP / Luxury</button>
+    </div>
+
+    <div class="car-grid" id="car-grid">
+        <div class="car-card" data-category="economic">
+            <img src="https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=500" alt="Dacia">
+            <div class="car-info">
+                <span class="tag">Economic</span>
+                <h3>Dacia Logan</h3>
+                <p class="price">30€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('Dacia Logan', '30€ / Day', 'economic', 'https://images.unsplash.com/photo-1541899481282-d53bffe3c35d?auto=format&fit=crop&w=500')">Rent This Car</button>
+        </div>
+
+                <div class="car-card" data-category="economic">
+            <img src="cio.jpg" alt="Renault Clio">
+            <div class="car-info">
+                <span class="tag">Economic</span>
+                <h3>Renault Clio</h3>
+                <p class="price">35€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('Renault Clio', '35€ / Day', 'Economic', 'cio.jpg')">Rent This Car</button>
+        </div>
+
+                <div class="car-card" data-category="economic">
+            <img src="https://images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=500" alt="Toyota Yaris">
+            <div class="car-info">
+                <span class="tag">Economic</span>
+                <h3>Toyota Yaris</h3>
+                <p class="price">40€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('Toyota Yaris', '40€ / Day', 'economic', '//images.unsplash.com/photo-1621135802920-133df287f89c?auto=format&fit=crop&w=500')">Rent This Car</button>
+        </div>
+
+                <div class="car-card" data-category="sport">
+            <img src="lamborghini.webp" alt="Lamborghini">
+            <div class="car-info">
+                <span class="tag">Sport</span>
+                <h3>Lamborghini Huracán</h3>
+                <p class="price">500€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('Lamborghini Huracán', '500€ / Day', 'Sport', 'lamborghini.webp')">Rent This Car</button>
+        </div>
+
+        <div class="car-card" data-category="sport">
+            <img src="https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=500" alt="BMW M4">
+            <div class="car-info">
+                <span class="tag">Sport</span>
+                <h3>BMW M4 Competition</h3>
+                <p class="price">180€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('BMW M4 Competition', '180€ / Day', 'Sport', '//images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=500')">Rent This Car</button>
+        </div>
+
+        <div class="car-card" data-category="vip">
+            <img src="https://images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=500" alt="Range Rover">
+            <div class="car-info">
+                <span class="tag">VIP</span>
+                <h3>Range Rover Autobiography</h3>
+                <p class="price">200€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('Range Rover Autobiography', '200€ / Day', 'vip', '//images.unsplash.com/photo-1563720223185-11003d516935?auto=format&fit=crop&w=500')">Rent This Car</button>
+        </div>
+                <div class="car-card" data-category="vip">
+            <img src="roll.webp" alt="Rolls Royce">
+            <div class="car-info">
+                <span class="tag">VIP</span>
+                <h3>Rolls-Royce Ghost</h3>
+                <p class="price">800€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('Rolls-Royce Ghost', '800€ / Day', 'vip', 'roll.webp')">Rent This Car</button>
+        </div>
+
+        <div class="car-card" data-category="sport">
+            <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=500" alt="Porsche">
+            <div class="car-info">
+                <span class="tag">Sport</span>
+                <h3>Porsche 911 Carrera</h3>
+                <p class="price">250€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('Porsche 911 Carrera', '250€ / Day', 'sport', 'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=500')">Rent This Car</button>
+        </div>
+
+        <div class="car-card" data-category="vip">
+            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=500" alt="Mercedes S">
+            <div class="car-info">
+                <span class="tag">VIP</span>
+                <h3>Mercedes-Benz S-Class</h3>
+                <p class="price">150€ / Day</p>
+            </div>
+            <button class="rent-btn" onclick="showDetails('Mercedes S-Class', '150€ / Day', 'vip', 'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=500')">Rent This Car</button>
+        </div>
+        </div>
+
+    <div id="car-modal" class="modal-overlay">
+        <div class="modal-window">
+            <button class="close-modal" onclick="closeDetails()">&times;</button>
+            <div class="modal-flex">
+                <div class="modal-image"><img id="modal-img" src="" alt="Car Image"></div>
+                <div class="modal-info">
+                    <h2 id="modal-title">Car Name</h2>
+                    <p id="modal-category" class="tag"></p>
+                    <div class="details-list">
+                        <p>✔️ Unlimited Mileage</p>
+                        <p>✔️ Insurance Included</p>
+                        <p>✔️ Full-to-Full Fuel Policy</p>
+                    </div>
+                    <hr>
+                    <p class="price-label">Price per Day:</p>
+                    <p id="modal-price" class="price"></p>
+                    <button class="confirm-btn" onclick="openInfoForm()">Confirm Rental</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="info-drawer" class="drawer-overlay">
+        <div class="drawer-content">
+            <button class="close-drawer" onclick="closeInfoForm()">&times;</button>
+            <h2>Complete Your Booking</h2>
+            <form id="booking-form" onsubmit="handleFinalSubmit(event)">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" placeholder="John Doe" required>
+                </div>
+                <div class="input-group">
+                    <label>Pickup Location</label>
+                    <input type="text" list="locations" placeholder="Choose a city..." required>
+                    <datalist id="locations">
+                        <option value="Paris, France"><option value="Tokyo, Japan"><option value="Marrakech, Morocco">
+                    </datalist>
+                </div>
+                <div class="date-row">
+                    <div class="input-group"><label>Pickup Date</label><input type="date" required></div>
+                    <div class="input-group"><label>Return Date</label><input type="date" required></div>
+                </div>
+
+                <label>Payment Method</label>
+                <div class="payment-options">
+                    <label class="pay-card"><input type="radio" name="pay" value="visa" onclick="toggleCardFields(true)" required><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa"></label>
+                    <label class="pay-card"><input type="radio" name="pay" value="mastercard" onclick="toggleCardFields(true)"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard"></label>
+                    <label class="pay-card"><input type="radio" name="pay" value="paypal" onclick="toggleCardFields(false)"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal"></label>
+                </div>
+
+                <div id="card-details-fields" style="display: none;">
+                    <div class="input-group"><label>Card Number</label><input type="text" placeholder="0000 0000 0000 0000" maxlength="19"></div>
+                    <div class="date-row">
+                        <div class="input-group"><label>Expiry Date</label><input type="text" placeholder="MM/YY" maxlength="5"></div>
+                        <div class="input-group"><label>CVV</label><input type="password" placeholder="123" maxlength="3"></div>
+                    </div>
+                </div>
+                
+                <button type="submit" id="final-submit-btn" class="final-btn">Reserve Now</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="success-overlay" class="success-overlay">
+        <div class="success-card">
+            <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
+            <h2>Reservation Confirmed!</h2>
+            <p>Your ride is being prepared. Check your email for details.</p>
+            <button class="final-btn" onclick="location.reload()">Great!</button>
+        </div>
+    </div>
+
+    <script>
+        function filterCars(category, event) {
+            const cards = document.querySelectorAll('.car-card');
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            cards.forEach(card => {
+                card.style.display = (category === 'all' || card.dataset.category === category) ? 'flex' : 'none';
+            });
+        }
+
+        function showDetails(name, price, category, imgSrc) {
+            document.getElementById('modal-title').innerText = name;
+            document.getElementById('modal-price').innerText = price;
+            document.getElementById('modal-category').innerText = category.toUpperCase();
+            document.getElementById('modal-img').src = imgSrc;
+            document.getElementById('car-modal').style.display = 'flex';
+        }
+
+        function closeDetails() { document.getElementById('car-modal').style.display = 'none'; }
+
+        function openInfoForm() {
+            closeDetails();
+            document.getElementById('info-drawer').classList.add('open');
+        }
+
+        function closeInfoForm() { document.getElementById('info-drawer').classList.remove('open'); }
+
+        function toggleCardFields(show) {
+            document.getElementById('card-details-fields').style.display = show ? 'block' : 'none';
+        }
+
+        function handleFinalSubmit(event) {
+            event.preventDefault();
+            const btn = document.getElementById('final-submit-btn');
+            btn.innerText = "Processing Transaction...";
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+
+            setTimeout(() => {
+                closeInfoForm();
+                document.getElementById('success-overlay').style.display = 'flex';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

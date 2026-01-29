@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Travel Type Quiz</title>
+<link rel="stylesheet" href="quiz.css">
+</head>
+
+<body>
+
+<div class="quiz-container">
+  <h1>Discover Your Travel Personality ✨</h1>
+  <p>Answer honestly — this is about <strong>you</strong>.</p>
+
+  <form id="quiz-form">
+
+    <div class="question">
+      <h3>1. Your ideal vacation feels like:</h3>
+      <label><input type="radio" name="q1" value="calm"> Calm & peaceful</label>
+      <label><input type="radio" name="q1" value="culture"> Rich in culture</label>
+      <label><input type="radio" name="q1" value="adventure"> Full of adrenaline</label>
+    </div>
+
+    <div class="question">
+      <h3>2. You prefer to travel:</h3>
+      <label><input type="radio" name="q2" value="calm"> Slowly</label>
+      <label><input type="radio" name="q2" value="culture"> With a plan</label>
+      <label><input type="radio" name="q2" value="adventure"> Spontaneously</label>
+    </div>
+
+    <div class="question">
+      <h3>3. Your favorite travel memory is:</h3>
+      <label><input type="radio" name="q3" value="culture"> Visiting museums</label>
+      <label><input type="radio" name="q3" value="adventure"> Trying something scary</label>
+      <label><input type="radio" name="q3" value="calm"> Quiet moments alone</label>
+    </div>
+
+    <button type="submit">See My Result</button>
+  </form>
+
+  <div id="result" class="result"></div>
+</div>
+
+<script src="quiz.js"></script>
+</body>
+</html>

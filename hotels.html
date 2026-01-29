@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Booking - OHA Travel</title>
+    <style>
+        :root {
+            --primary: #ff5722;
+            --dark: #1a1a1a;
+            --light: #f4f4f4;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--light); margin: 0; padding: 20px; color: var(--dark); }
+        
+        .header-area { text-align: center; margin-bottom: 40px; }
+        .back-home { text-decoration: none; color: var(--primary); font-weight: bold; display: inline-block; margin-bottom: 10px; }
+        
+        /* City Filters */
+        .filter-container { margin-bottom: 30px; text-align: center; position: sticky; top: 10px; z-index: 100; }
+        .filter-btn { 
+            padding: 12px 25px; margin: 5px; cursor: pointer; 
+            border: 2px solid var(--primary); border-radius: 30px; 
+            background: white; color: var(--primary); font-weight: bold; transition: 0.3s;
+        }
+        .filter-btn.active, .filter-btn:hover { background: var(--primary); color: white; }
+        
+        /* Grid Layout */
+        .hotel-grid { 
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
+            gap: 25px; max-width: 1200px; margin: 0 auto;
+        }
+
+        /* Hotel Cards */
+        .hotel-card { 
+            background: white; border-radius: 20px; overflow: hidden; 
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: transform 0.3s;
+            display: flex; flex-direction: column;
+        }
+        .hotel-card:hover { transform: translateY(-10px); }
+        .hotel-card img { width: 100%; height: 200px; object-fit: cover; }
+        
+        .hotel-info { padding: 20px; text-align: center; flex-grow: 1; }
+        .hotel-info h3 { margin: 10px 0; font-size: 1.2rem; }
+        .price { color: var(--primary); font-weight: bold; font-size: 1.3rem; margin: 10px 0; }
+        .city-tag { font-size: 0.75rem; background: #eee; padding: 5px 12px; border-radius: 50px; font-weight: bold; text-transform: uppercase; }
+        
+        .book-btn {
+            background: var(--dark); color: white; border: none; padding: 12px;
+            width: 100%; border-radius: 0 0 20px 20px; cursor: pointer; font-weight: bold;
+        }
+        .book-btn:hover { background: var(--primary); }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 2000;
+            justify-content: center; align-items: center;
+        }
+        .modal-window {
+            background: white; width: 90%; max-width: 800px; border-radius: 20px;
+            position: relative; padding: 30px; animation: slideUp 0.3s ease-out;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+        /* Drawer Overlay (Semi-page) */
+        .drawer-overlay {
+            position: fixed; top: 0; right: -100%; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 3000; transition: 0.4s ease;
+        }
+        .drawer-overlay.open { right: 0; }
+        .drawer-content {
+            position: absolute; right: 0; top: 0; width: 100%; max-width: 450px; height: 100%;
+            background: white; padding: 40px 30px; box-shadow: -5px 0 15px rgba(0,0,0,0.1); overflow-y: auto;
+        }
+
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 30px; border: none; background: none; cursor: pointer; }
+
+        /* Form Styling */
+        .input-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+        .input-group label { font-weight: bold; font-size: 0.85rem; margin-bottom: 5px; }
+        .input-group input { padding: 12px; border: 1px solid #ddd; border-radius: 8px; }
+        .date-row { display: flex; gap: 15px; }
+        .date-row .input-group { flex: 1; }
+
+        /* Payment Styles */
+        .payment-options { display: flex; gap: 10px; margin: 10px 0 20px 0; }
+        .pay-card { flex: 1; border: 2px solid #eee; padding: 10px; border-radius: 10px; cursor: pointer; text-align: center; transition: 0.3s; }
+        .pay-card img { height: 25px; }
+        .pay-card input { display: none; }
+        .pay-card:has(input:checked) { border-color: var(--primary); background: #fff4f1; }
+
+        #card-details { background: #f9f9f9; padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px dashed #ccc; }
+
+        .final-btn { width: 100%; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+
+        /* Success Message */
+        .success-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 4000; justify-content: center; align-items: center;
+        }
+        .success-card { background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px; animation: popIn 0.4s; }
+        @keyframes popIn { from { transform: scale(0.5); } to { transform: scale(1); } }
+    </style>
+</head>
+<body>
+
+    <div class="header-area">
+        <a href="test.html" class="back-home">← Back to Homepage</a>
+        <h1>Explore Global Stays</h1>
+    </div>
+
+    <div class="filter-container">
+        <button class="filter-btn active" onclick="filterHotels('all', event)">All Cities</button>
+        <button class="filter-btn" onclick="filterHotels('paris', event)">Paris</button>
+        <button class="filter-btn" onclick="filterHotels('marrakesh', event)">Marrakesh</button>
+        <button class="filter-btn" onclick="filterHotels('dubai', event)">Dubai</button>
+        <button class="filter-btn" onclick="filterHotels('tokyo', event)">Tokyo</button>
+    </div>
+
+    <div class="hotel-grid" id="hotel-grid">
+        <div class="hotel-card" data-city="paris">
+            <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500">
+            <div class="hotel-info"><span class="city-tag">Paris</span><h3>Hotel France Louvre</h3><p class="price">75€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('Hotel France Louvre', '75€', 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=500')">Book Room</button>
+        </div>
+        <div class="hotel-card" data-city="paris">
+            <img src="pullman.jpg">
+            <div class="hotel-info"><span class="city-tag">Paris</span><h3>Pullman Tour Eiffel</h3><p class="price">210€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('Pullman Tour Eiffel', '210€', 'pullman.jpg')">Book Room</button>
+        </div>
+        <div class="hotel-card" data-city="paris">
+            <img src="https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=500">
+            <div class="hotel-info"><span class="city-tag">Paris</span><h3>The Ritz Paris</h3><p class="price">950€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('The Ritz Paris', '950€', 'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=500')">Book Room</button>
+        </div>
+
+        <div class="hotel-card" data-city="marrakesh">
+            <img src="https://images.unsplash.com/photo-1549294413-26f195200c16?auto=format&fit=crop&w=500">
+            <div class="hotel-info"><span class="city-tag">Marrakesh</span><h3>BÔ Riad SPA</h3><p class="price">82€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('BÔ Riad SPA', '82€', 'https://images.unsplash.com/photo-1549294413-26f195200c16?auto=format&fit=crop&w=500')">Book Room</button>
+        </div>
+        <div class="hotel-card" data-city="marrakesh">
+            <img src="mamounia.jpg">
+            <div class="hotel-info"><span class="city-tag">Marrakesh</span><h3>La Mamounia</h3><p class="price">600€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('La Mamounia', '600€', 'mamounia.jpg')">Book Room</button>
+        </div>
+        <div class="hotel-card" data-city="marrakesh">
+            <img src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500">
+            <div class="hotel-info"><span class="city-tag">Marrakesh</span><h3>Selman Marrakech</h3><p class="price">450€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('Selman Marrakech', '450€', 'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?auto=format&fit=crop&w=500')">Book Room</button>
+        </div>
+
+        <div class="hotel-card" data-city="dubai">
+            <img src="citymax.jpg">
+            <div class="hotel-info"><span class="city-tag">Dubai</span><h3>Citymax Bur Dubai</h3><p class="price">54€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('Citymax Bur Dubai', '54€', 'citymax.jpg')">Book Room</button>
+        </div>
+        <div class="hotel-card" data-city="dubai">
+            <img src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=500">
+            <div class="hotel-info"><span class="city-tag">Dubai</span><h3>Atlantis The Palm</h3><p class="price">400€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('Atlantis The Palm', '400€', 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=500')">Book Room</button>
+        </div>
+        <div class="hotel-card" data-city="dubai">
+            <img src="burj.jpg">
+            <div class="hotel-info"><span class="city-tag">Dubai</span><h3>Burj Al Arab</h3><p class="price">1200€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('Burj Al Arab', '1200€', 'burj.jpg')">Book Room</button>
+        </div>
+
+        <div class="hotel-card" data-city="tokyo">
+            <img src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=500">
+            <div class="hotel-info"><span class="city-tag">Tokyo</span><h3>Hotel MONday</h3><p class="price">41€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('Hotel MONday', '41€', 'https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=500')">Book Room</button>
+        </div>
+        <div class="hotel-card" data-city="tokyo">
+            <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=500">
+            <div class="hotel-info"><span class="city-tag">Tokyo</span><h3>The Peninsula Tokyo</h3><p class="price">550€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('The Peninsula Tokyo', '550€', 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=500')">Book Room</button>
+        </div>
+        <div class="hotel-card" data-city="tokyo">
+            <img src="park.jpg">
+            <div class="hotel-info"><span class="city-tag">Tokyo</span><h3>Park Hyatt Tokyo</h3><p class="price">700€ / Night</p></div>
+            <button class="book-btn" onclick="openModal('Park Hyatt Tokyo', '700€', 'park.jpg')">Book Room</button>
+        </div>
+    </div>
+
+    <div id="hotel-modal" class="modal-overlay">
+        <div class="modal-window">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div style="display:flex; gap:30px; flex-wrap:wrap;">
+                <img id="m-img" style="flex:1; width:100%; border-radius:15px; min-width:250px;">
+                <div style="flex:1;">
+                    <h2 id="m-title">Hotel Name</h2>
+                    <p>✔️ Free Cancellation</p>
+                    <p>✔️ Breakfast Included</p>
+                    <p>✔️ 5-Star Experience</p>
+                    <hr>
+                    <p>Rate: <span id="m-price" class="price"></span></p>
+                    <button class="final-btn" onclick="openDrawer()">Confirm Selection</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="hotel-drawer" class="drawer-overlay">
+        <div class="drawer-content">
+            <button class="close-btn" onclick="closeDrawer()">&times;</button>
+            <h2>Complete Your Stay</h2>
+            <form onsubmit="handleFinalSubmit(event)">
+                <div class="input-group"><label>Full Name</label><input type="text" placeholder="John Doe" required></div>
+                <div class="input-group">
+                    <label>City Destination</label>
+                    <input type="text" list="locations" placeholder="Confirm your city...">
+                    <datalist id="locations">
+                        <option value="Paris, France"><option value="Tokyo, Japan"><option value="Marrakech, Morocco"><option value="Dubai, UAE">
+                    </datalist>
+                </div>
+                <div class="date-row">
+                    <div class="input-group"><label>Check-in</label><input type="date" required></div>
+                    <div class="input-group"><label>Check-out</label><input type="date" required></div>
+                </div>
+
+                <label>Payment Method</label>
+                <div class="payment-options">
+                    <label class="pay-card"><input type="radio" name="p" value="visa" onclick="toggleCard(true)" required><img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"></label>
+                    <label class="pay-card"><input type="radio" name="p" value="mastercard" onclick="toggleCard(true)"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"></label>
+                    <label class="pay-card"><input type="radio" name="p" value="paypal" onclick="toggleCard(false)"><img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg"></label>
+                </div>
+
+                <div id="card-details" style="display:none;">
+                    <div class="input-group"><label>Card Number</label><input type="text" placeholder="XXXX XXXX XXXX XXXX"></div>
+                    <div class="date-row">
+                        <div class="input-group"><label>Expiry</label><input type="text" placeholder="MM/YY"></div>
+                        <div class="input-group"><label>CVV</label><input type="password" placeholder="***"></div>
+                    </div>
+                </div>
+                <button type="submit" id="submit-btn" class="final-btn">Reserve Room</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="success-overlay" class="success-overlay">
+        <div class="success-card">
+            <div style="font-size:60px;">✅</div>
+            <h2>Booking Confirmed!</h2>
+            <p>Your room is waiting for you.</p>
+            <button class="final-btn" onclick="location.reload()">Back to Hotels</button>
+        </div>
+    </div>
+
+    <script>
+        function filterHotels(city, event) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            document.querySelectorAll('.hotel-card').forEach(c => {
+                c.style.display = (city === 'all' || c.dataset.city === city) ? 'flex' : 'none';
+            });
+        }
+
+        function openModal(name, price, img) {
+            document.getElementById('m-title').innerText = name;
+            document.getElementById('m-price').innerText = price;
+            document.getElementById('m-img').src = img;
+            document.getElementById('hotel-modal').style.display = 'flex';
+        }
+
+        function closeModal() { 
+            document.getElementById('hotel-modal').style.display = 'none'; 
+        }
+        
+        function openDrawer() { 
+            closeModal(); 
+            document.getElementById('hotel-drawer').classList.add('open'); 
+        }
+
+        function closeDrawer() { 
+            document.getElementById('hotel-drawer').classList.remove('open'); 
+        }
+
+        function toggleCard(show) { 
+            document.getElementById('card-details').style.display = show ? 'block' : 'none'; 
+        }
+
+        function handleFinalSubmit(event) {
+            event.preventDefault();
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = "Checking availability...";
+            btn.disabled = true;
+            setTimeout(() => {
+                closeDrawer();
+                document.getElementById('success-overlay').style.display = 'flex';
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
